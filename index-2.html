@@ -1,0 +1,2462 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Panne Solution</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="preconnect" href="https://cdn.jsdelivr.net"/>
+<link rel="preconnect" href="https://tqcsdflnxcwhcdfvtxao.supabase.co"/>
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net"/>
+<link rel="dns-prefetch" href="https://tqcsdflnxcwhcdfvtxao.supabase.co"/>
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" as="script"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+<noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/></noscript>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" media="print" onload="this.media='all'"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#070E17;
+  --bg2:#0B1622;
+  --bg3:#101E2E;
+  --card:rgba(11,22,34,0.97);
+  --accent:#FF6B2B;
+  --accent2:#FF8C5A;
+  --blue:#3B9EFF;
+  --green:#00D37F;
+  --red:#FF3D5A;
+  --yellow:#FFB340;
+  --purple:#8B5CF6;
+  --border:rgba(255,107,43,0.15);
+  --border2:rgba(255,255,255,0.06);
+  --text:#F0F6FF;
+  --text2:#8899AA;
+  --text3:#445566;
+  --shadow:0 8px 40px rgba(0,0,0,0.6);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans','Segoe UI',sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:'Plus Jakarta Sans','Segoe UI',sans-serif;cursor:pointer}
+input,select,textarea{font-family:'Plus Jakarta Sans','Segoe UI',sans-serif}
+a{color:inherit;text-decoration:none}
+svg{display:block;flex-shrink:0}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,107,43,0.25);border-radius:4px}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(255,107,43,0.3)}50%{box-shadow:0 0 40px rgba(255,107,43,0.6)}}
+@keyframes ripple{0%{transform:scale(0);opacity:0.4}100%{transform:scale(4);opacity:0}}
+@keyframes badgePop{0%{transform:scale(0.5)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+/* LAYOUT */
+#app{min-height:100vh}
+.page{display:none;flex-direction:column;min-height:100vh}
+.page.active{display:flex}
+
+/* CARDS */
+.card{
+  background:var(--card);
+  border:1px solid var(--border2);
+  border-radius:18px;
+  padding:20px;
+  backdrop-filter:blur(16px);
+  transition:border-color 0.2s;
+}
+.card-glow{border-color:rgba(255,107,43,0.25);box-shadow:0 0 0 1px rgba(255,107,43,0.05),inset 0 1px 0 rgba(255,255,255,0.05)}
+
+/* INPUTS */
+.inp{
+  width:100%;
+  background:rgba(7,14,23,0.8);
+  border:1px solid var(--border2);
+  border-radius:12px;
+  padding:13px 16px;
+  color:var(--text);
+  font-size:14px;
+  font-weight:500;
+  outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.inp:focus{border-color:rgba(255,107,43,0.4);box-shadow:0 0 0 3px rgba(255,107,43,0.08)}
+.inp::placeholder{color:var(--text3)}
+select.inp option{background:#0B1622;color:var(--text)}
+textarea.inp{resize:vertical;min-height:80px}
+.inp-wrap{position:relative}
+.inp-wrap .inp-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+.inp-wrap .inp{padding-left:42px}
+
+/* BUTTONS */
+.btn{
+  border:none;
+  border-radius:12px;
+  padding:13px 24px;
+  font-weight:700;
+  font-size:14px;
+  cursor:pointer;
+  color:#fff;
+  transition:transform 0.15s,opacity 0.15s,box-shadow 0.15s;
+  position:relative;
+  overflow:hidden;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.btn:active{transform:scale(0.97)}
+.btn:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+.btn-primary{background:linear-gradient(135deg,#FF6B2B,#FF4500);box-shadow:0 4px 20px rgba(255,107,43,0.35)}
+.btn-primary:hover:not(:disabled){box-shadow:0 6px 28px rgba(255,107,43,0.5)}
+.btn-green{background:linear-gradient(135deg,#00D37F,#00A062);box-shadow:0 4px 20px rgba(0,211,127,0.3)}
+.btn-blue{background:linear-gradient(135deg,#3B9EFF,#2563EB);box-shadow:0 4px 20px rgba(59,158,255,0.3)}
+.btn-purple{background:linear-gradient(135deg,#8B5CF6,#6D28D9);box-shadow:0 4px 20px rgba(139,92,246,0.3)}
+.btn-red{background:linear-gradient(135deg,#FF3D5A,#DC2626);box-shadow:0 4px 20px rgba(255,61,90,0.3)}
+.btn-ghost{background:rgba(255,255,255,0.05);border:1px solid var(--border2);color:var(--text2)}
+.btn-ghost:hover{background:rgba(255,255,255,0.08);color:var(--text)}
+.btn-full{width:100%}
+.btn-sm{padding:8px 16px;font-size:13px;border-radius:10px}
+.btn-outline{background:transparent;border:1.5px solid var(--accent);color:var(--accent);border-radius:12px;padding:11px 22px;font-weight:700;font-size:14px;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px}
+.btn-outline:hover{background:rgba(255,107,43,0.08)}
+
+/* BADGES */
+.badge{border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.tag{border-radius:8px;padding:3px 9px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+
+/* STATUS DOTS */
+.dot-green{width:8px;height:8px;background:var(--green);border-radius:50%;display:inline-block;box-shadow:0 0 0 3px rgba(0,211,127,0.2)}
+.dot-red{width:8px;height:8px;background:var(--red);border-radius:50%;display:inline-block}
+.dot-yellow{width:8px;height:8px;background:var(--yellow);border-radius:50%;display:inline-block}
+
+/* TOAST */
+#toast{position:fixed;top:20px;right:20px;z-index:9999;display:none;animation:slideDown 0.3s ease;max-width:320px;min-width:220px}
+#toast.show{display:flex;align-items:center;gap:10px;border-radius:14px;padding:13px 18px;font-weight:600;font-size:13px;box-shadow:0 8px 40px rgba(0,0,0,0.5);backdrop-filter:blur(20px)}
+
+/* STICKY HEADER */
+.sticky-header{
+  background:rgba(7,14,23,0.92);
+  border-bottom:1px solid var(--border2);
+  padding:14px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:100;
+  backdrop-filter:blur(24px);
+}
+.logo-mark{
+  width:38px;height:38px;
+  background:linear-gradient(135deg,#FF6B2B,#FF4500);
+  border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 4px 16px rgba(255,107,43,0.4);
+}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:rgba(7,14,23,0.97);
+  border-top:1px solid var(--border2);
+  backdrop-filter:blur(24px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.nav-inner{display:flex;max-width:600px;margin:0 auto}
+.nav-btn{
+  flex:1;padding:11px 8px 10px;background:none;border:none;cursor:pointer;
+  color:var(--text3);display:flex;flex-direction:column;align-items:center;gap:4px;
+  position:relative;transition:color 0.2s;
+}
+.nav-btn.active{color:var(--accent)}
+.nav-btn .nav-label{font-size:10px;font-weight:700;letter-spacing:0.3px;text-transform:uppercase}
+.nav-btn .nav-indicator{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:20px;height:2px;background:var(--accent);border-radius:2px 2px 0 0;opacity:0;transition:opacity 0.2s}
+.nav-btn.active .nav-indicator{opacity:1}
+.nav-badge{position:absolute;top:7px;right:18%;background:var(--red);color:#fff;border-radius:10px;font-size:9px;font-weight:800;padding:1px 5px;animation:badgePop 0.3s ease}
+
+/* CONTENT */
+.content{padding:18px;max-width:600px;margin:0 auto;padding-bottom:88px;flex:1;animation:fadeUp 0.3s ease}
+.admin-content{padding:18px;max-width:740px;margin:0 auto;padding-bottom:88px;flex:1}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal-box{background:#0B1622;border:1px solid var(--border2);border-radius:20px;padding:24px;width:100%;max-width:480px;position:relative;max-height:90vh;overflow-y:auto;animation:slideUp 0.3s ease}
+.modal-sheet{background:#0B1622;border:1px solid var(--border2);border-radius:22px 22px 0 0;padding:24px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;animation:slideUp 0.35s ease}
+.modal-handle{width:36px;height:4px;background:rgba(255,255,255,0.12);border-radius:4px;margin:0 auto 20px}
+
+/* AVATAR */
+.avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+
+/* REQUEST CARDS */
+.req-card{margin-bottom:12px;animation:fadeUp 0.3s ease}
+
+/* TECH CONTACT */
+.tech-card{background:linear-gradient(135deg,rgba(0,211,127,0.06),rgba(59,158,255,0.04));border:1.5px solid rgba(0,211,127,0.25);border-radius:16px;overflow:hidden;animation:fadeUp 0.35s ease;margin-top:12px}
+
+/* PROGRESS */
+.progress-bar{background:rgba(255,255,255,0.06);border-radius:8px;height:5px;overflow:hidden;margin-top:10px}
+.progress-fill{height:100%;border-radius:8px;transition:width 0.5s ease}
+
+/* STEP DOTS */
+.step-dot{width:8px;height:8px;border-radius:50%;transition:all 0.3s}
+
+/* MAP */
+#mapContainer{border-radius:18px;overflow:hidden;border:1px solid var(--border2);position:relative;box-shadow:var(--shadow)}
+#leafletMap{height:340px;width:100%}
+
+/* CHAT */
+.chat-messages{min-height:260px;max-height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 0;margin-bottom:12px}
+.msg-bubble{max-width:75%;border-radius:16px;padding:10px 14px;font-size:14px;line-height:1.5;word-break:break-word}
+.msg-me{background:linear-gradient(135deg,#FF6B2B,#FF4500);border-radius:16px 16px 4px 16px;margin-left:auto;box-shadow:0 2px 12px rgba(255,107,43,0.3)}
+.msg-other{background:rgba(255,255,255,0.07);border:1px solid var(--border2);border-radius:16px 16px 16px 4px}
+.msg-time{font-size:10px;color:rgba(255,255,255,0.35);margin-top:4px;text-align:right}
+.msg-other .msg-time{text-align:left}
+
+/* AUTH */
+.auth-bg{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at 30% 20%,rgba(255,107,43,0.08) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(59,158,255,0.06) 0%,transparent 60%),var(--bg)}
+.auth-tabs{display:flex;background:rgba(255,255,255,0.04);border-radius:12px;padding:4px;margin-bottom:22px}
+.auth-tab{flex:1;padding:10px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--text3)}
+.auth-tab.active{background:rgba(255,107,43,0.15);color:var(--accent)}
+
+/* PLAN CARDS */
+.plan-card{border:2px solid var(--border2);border-radius:14px;padding:16px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.plan-card.selected{background:rgba(255,107,43,0.06)}
+.plan-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,0.01));pointer-events:none}
+
+/* GRID */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+
+/* SPINNER */
+.spinner{width:36px;height:36px;border:3px solid rgba(255,107,43,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border2);margin:16px 0}
+
+/* SECTION TITLE */
+.section-title{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+
+/* STAT CARD */
+.stat-card{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:18px;text-align:center}
+.stat-num{font-size:28px;font-weight:900;margin-bottom:4px;font-family:'Space Grotesk',sans-serif}
+.stat-label{font-size:12px;color:var(--text2);font-weight:600}
+
+/* URGENCY TOGGLE */
+.urgency-btn{flex:1;padding:11px;border:2px solid var(--border2);border-radius:11px;font-weight:700;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--text3)}
+.urgency-btn.active-normal{border-color:#3B9EFF;background:rgba(59,158,255,0.08);color:#3B9EFF}
+.urgency-btn.active-urgent{border-color:#FF3D5A;background:rgba(255,61,90,0.08);color:#FF3D5A}
+
+/* PHOTO */
+.photo-circle{width:72px;height:72px;border-radius:50%;overflow:hidden;border:2px dashed rgba(139,92,246,0.4);cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(139,92,246,0.06);flex-shrink:0;transition:border-color 0.2s}
+.photo-circle:hover{border-color:rgba(139,92,246,0.7)}
+.photo-circle img{width:100%;height:100%;object-fit:cover}
+
+/* PENDING / EXPIRED */
+.centered-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at center,rgba(255,107,43,0.05),transparent 70%),var(--bg)}
+
+/* ONLINE INDICATOR */
+.online-ring{position:absolute;bottom:1px;right:1px;width:13px;height:13px;background:var(--green);border:2.5px solid var(--bg);border-radius:50%}
+
+/* INFO ROW */
+.info-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border2)}
+.info-row:last-child{border-bottom:none;padding-bottom:0}
+.info-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* FLOATING ACTION BUTTON */
+.fab{position:fixed;bottom:90px;right:18px;z-index:190;width:58px;height:58px;border-radius:50%;border:none;background:linear-gradient(135deg,#FF3D5A,#DC2626);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 28px rgba(255,61,90,0.45);transition:transform 0.2s,box-shadow 0.2s;animation:glow 3s ease-in-out infinite}
+.fab:active{transform:scale(0.93)}
+
+/* NOTIFICATION BANNER */
+.notif-banner{background:linear-gradient(135deg,rgba(0,211,127,0.12),rgba(0,211,127,0.04));border:1px solid rgba(0,211,127,0.25);border-radius:14px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.notif-banner.red{background:linear-gradient(135deg,rgba(255,61,90,0.1),rgba(255,61,90,0.03));border-color:rgba(255,61,90,0.25)}
+
+/* HERO CARD */
+.hero-card{background:linear-gradient(135deg,#0F1F35,#1A0E0A);border:1px solid rgba(255,107,43,0.2);border-radius:20px;padding:24px;margin-bottom:18px;position:relative;overflow:hidden}
+.hero-card::after{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(255,107,43,0.15),transparent);pointer-events:none}
+
+/* MISSION BADGE */
+.mission-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,211,127,0.12);border:1px solid rgba(0,211,127,0.25);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;color:var(--green)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+
+<!-- SVG ICONS -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+<symbol id="ic-wrench" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+<symbol id="ic-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></symbol>
+<symbol id="ic-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></symbol>
+<symbol id="ic-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="ic-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+<symbol id="ic-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+<symbol id="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></symbol>
+<symbol id="ic-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+<symbol id="ic-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+<symbol id="ic-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+<symbol id="ic-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+<symbol id="ic-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
+<symbol id="ic-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></symbol>
+<symbol id="ic-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></symbol>
+<symbol id="ic-dollar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></symbol>
+<symbol id="ic-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+<symbol id="ic-locate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="9"/></symbol>
+<symbol id="ic-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.36 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 5.55 5.55l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+<symbol id="ic-location" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+<symbol id="ic-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+<symbol id="ic-star" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+<symbol id="ic-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+<symbol id="ic-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+<symbol id="ic-tool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+<symbol id="ic-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+</svg>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════
+//  SUPABASE — chargement dynamique garanti
+// ═══════════════════════════════════════════════════════════
+// Clés Supabase — la clé doit être la clé anon JWT (eyJ...)
+// Récupérer depuis localStorage si déjà sauvegardées
+var SUPA_URL = localStorage.getItem('ps_supa_url') || 'https://tqcsdflnxcwhcdfvtxao.supabase.co';
+var SUPA_KEY = localStorage.getItem('ps_supa_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxY3NkZmxueGN3aGNkZnZ0eGFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0OTQ4MDMsImV4cCI6MjA5NTA3MDgwM30.FwSFvZK-oxNbTeBiz2uDM6si1tYk9N30ebE8uXiAaX4';
+var supabase = null;
+
+function loadSupabaseSDK(){
+  return new Promise((resolve, reject) => {
+    if(window.supabase && window.supabase.createClient){ resolve(); return; }
+    // Check if already loading
+    const existing = document.querySelector('script[data-supa]');
+    if(existing){ existing.addEventListener('load',resolve); existing.addEventListener('error',reject); return; }
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+    script.setAttribute('data-supa','1');
+    script.crossOrigin = 'anonymous';
+    script.onload = () => {
+      if(window.supabase && window.supabase.createClient){ resolve(); }
+      else { reject(new Error('SDK introuvable')); }
+    };
+    script.onerror = () => reject(new Error('Impossible de charger le SDK Supabase'));
+    document.head.appendChild(script);
+  });
+}
+
+function initSupabase(){
+  try{
+    supabase = window.supabase.createClient(SUPA_URL, SUPA_KEY, {
+      auth:{
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: false,
+        flowType: 'pkce'
+      },
+      global:{
+        headers:{ 'X-Client-Info': 'panne-solution/1.0' }
+      }
+    });
+    return true;
+  } catch(e){ console.error('Supabase init:', e); return false; }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DB LAYER
+// ═══════════════════════════════════════════════════════════
+var DB = (() => {
+  let _cache = { users:{}, current:null, requests:[], messages:[], payments:[] };
+  let _listeners = [];
+  const notify = () => _listeners.forEach(fn=>{ try{fn()}catch(e){} });
+
+  function mapProfile(r){
+    if(!r) return null;
+    return {
+      id:r.id, name:r.name||r.full_name||'', email:r.email||'',
+      role:r.role||'driver', phone:r.phone||'', specialty:r.specialty||'',
+      garageName:r.garage_name||'', garageLocation:r.garage_location||'',
+      location:r.location||r.garage_location||'Lomé, Togo',
+      photoUrl:r.photo_url||null, plan:r.plan||'free',
+      planStart:r.plan_start||Date.now(), planStatus:r.plan_status||'active',
+      pendingPlan:r.pending_plan||null, pendingPaymentId:r.pending_payment_id||null,
+      joinedAt:r.joined_at||Date.now(), rating:r.rating||0, completedJobs:r.completed_jobs||0,
+    };
+  }
+
+  async function signUp(email, password, meta){
+    const { data, error } = await supabase.auth.signUp({
+      email, password,
+      options:{ data: meta, emailRedirectTo: 'https://panne-solution.netlify.app' }
+    });
+    if(error) throw error;
+    const uid = data.user.id;
+    const profile = {
+      id: uid, email, ...meta, plan:'free',
+      plan_start:Date.now(), plan_status:'active',
+      joined_at:Date.now(), rating:0, completed_jobs:0
+    };
+    const { error:pe } = await supabase.from('profiles').upsert(profile);
+    if(pe) throw pe;
+    _cache.current = mapProfile(profile);
+    notify();
+    return _cache.current;
+  }
+
+  async function signIn(email, password){
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if(error) throw error;
+    const profile = await fetchProfile(data.user.id);
+    _cache.current = profile;
+    notify();
+    return profile;
+  }
+
+  async function signOut(){
+    await supabase.auth.signOut();
+    localStorage.removeItem('ps_uid');
+    _cache.current = null;
+    notify();
+  }
+
+  async function fetchProfile(uid){
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', uid).single();
+    if(error) throw error;
+    return mapProfile(data);
+  }
+
+  async function loadRequests(){
+    const { data, error } = await supabase.from('requests').select('*').order('created_at',{ascending:false});
+    if(error){ const m=error?.message||error?.code||''; if(m.includes('42P01')||m.includes('does not exist')) console.error('Table requests manquante'); return _cache.requests; }
+    _cache.requests = (data||[]).map(r=>({
+      id:r.id, breakdownType:r.breakdown_type, techType:r.tech_type,
+      location:r.location, description:r.description||'', urgency:r.urgency||'normal',
+      userId:r.user_id, userName:r.user_name, userPhone:r.user_phone||'',
+      status:r.status||'open', assignedTo:r.assigned_to||null, assignedName:r.assigned_name||null,
+      createdAt:new Date(r.created_at).getTime(), lat:r.lat||null, lng:r.lng||null,
+    }));
+    return _cache.requests;
+  }
+
+  async function insertRequest(req){
+    const { data, error } = await supabase.from('requests').insert({
+      breakdown_type:req.breakdownType, tech_type:req.techType, location:req.location,
+      description:req.description||'', urgency:req.urgency||'normal',
+      user_id:req.userId, user_name:req.userName, user_phone:req.userPhone||'',
+      status:'open', lat:req.lat||null, lng:req.lng||null,
+      created_at:new Date().toISOString(),
+    }).select().single();
+    if(error) throw error;
+    return data;
+  }
+
+  async function updateRequest(id, fields){
+    const mapped = {};
+    if(fields.status!==undefined) mapped.status=fields.status;
+    if(fields.assignedTo!==undefined) mapped.assigned_to=fields.assignedTo;
+    if(fields.assignedName!==undefined) mapped.assigned_name=fields.assignedName;
+    const { error } = await supabase.from('requests').update(mapped).eq('id',id);
+    if(error) throw error;
+  }
+
+  async function loadMessages(){
+    const { data, error } = await supabase.from('messages').select('*').order('created_at',{ascending:true});
+    if(error){ const m=error?.message||error?.code||''; if(m.includes('42P01')||m.includes('does not exist')) console.error('Table messages manquante'); return _cache.messages; }
+    const map = {};
+    (data||[]).forEach(m=>{
+      if(!map[m.chat_id]) map[m.chat_id]={
+        id:m.chat_id, participants:m.participants||[], participantNames:m.participant_names||{}, messages:[]
+      };
+      map[m.chat_id].messages.push({
+        id:m.id, from:m.sender_id, text:m.text, time:new Date(m.created_at).getTime(), read:m.read||false
+      });
+    });
+    _cache.messages = Object.values(map);
+    return _cache.messages;
+  }
+
+  async function insertMessage(chatId, participants, participantNames, msg){
+    const { error } = await supabase.from('messages').insert({
+      chat_id:chatId, participants, participant_names:participantNames,
+      sender_id:msg.from, text:msg.text, read:false, created_at:new Date().toISOString(),
+    });
+    if(error) throw error;
+  }
+
+  async function loadPayments(){
+    const { data, error } = await supabase.from('payments').select('*').order('created_at',{ascending:false});
+    if(error){ const m=error?.message||error?.code||''; if(m.includes('42P01')||m.includes('does not exist')) console.error('Table payments manquante'); return _cache.payments; }
+    _cache.payments = (data||[]).map(p=>({
+      id:p.id, userId:p.user_id, userName:p.user_name, userEmail:p.user_email,
+      plan:p.plan, planName:p.plan_name, method:p.method, methodName:p.method_name,
+      txRef:p.tx_ref, amount:p.amount, status:p.status||'pending',
+      createdAt:new Date(p.created_at).getTime(),
+      reviewedAt:p.reviewed_at?new Date(p.reviewed_at).getTime():null,
+      reviewedBy:p.reviewed_by||null, rejectReason:p.reject_reason||null,
+    }));
+    return _cache.payments;
+  }
+
+  async function insertPayment(pay){
+    const { data, error } = await supabase.from('payments').insert({
+      user_id:pay.userId, user_name:pay.userName, user_email:pay.userEmail,
+      plan:pay.plan, plan_name:pay.planName, method:pay.method, method_name:pay.methodName,
+      tx_ref:pay.txRef, amount:pay.amount, status:'pending', created_at:new Date().toISOString(),
+    }).select().single();
+    if(error) throw error;
+    return data;
+  }
+
+  async function updatePayment(id, fields){
+    const mapped = {};
+    if(fields.status!==undefined) mapped.status=fields.status;
+    if(fields.reviewedAt!==undefined) mapped.reviewed_at=new Date(fields.reviewedAt).toISOString();
+    if(fields.reviewedBy!==undefined) mapped.reviewed_by=fields.reviewedBy;
+    if(fields.rejectReason!==undefined) mapped.reject_reason=fields.rejectReason;
+    const { error } = await supabase.from('payments').update(mapped).eq('id',id);
+    if(error) throw error;
+  }
+
+  async function updateProfile(id, fields){
+    const mapped = {};
+    if(fields.name!==undefined) mapped.name=fields.name;
+    if(fields.phone!==undefined) mapped.phone=fields.phone;
+    if(fields.location!==undefined) mapped.location=fields.location;
+    if(fields.specialty!==undefined) mapped.specialty=fields.specialty;
+    if(fields.garageName!==undefined) mapped.garage_name=fields.garageName;
+    if(fields.garageLocation!==undefined) mapped.garage_location=fields.garageLocation;
+    if(fields.photoUrl!==undefined) mapped.photo_url=fields.photoUrl;
+    if(fields.plan!==undefined) mapped.plan=fields.plan;
+    if(fields.planStart!==undefined) mapped.plan_start=fields.planStart;
+    if(fields.planStatus!==undefined) mapped.plan_status=fields.planStatus;
+    if(fields.pendingPlan!==undefined) mapped.pending_plan=fields.pendingPlan;
+    if(fields.pendingPaymentId!==undefined) mapped.pending_payment_id=fields.pendingPaymentId;
+    if(fields.rating!==undefined) mapped.rating=fields.rating;
+    if(fields.completedJobs!==undefined) mapped.completed_jobs=fields.completedJobs;
+    const { error } = await supabase.from('profiles').update(mapped).eq('id',id);
+    if(error) throw error;
+    if(_cache.current?.id===id) _cache.current={..._cache.current,...fields};
+    notify();
+  }
+
+  async function loadAllProfiles(){
+    const { data, error } = await supabase.from('profiles').select('*');
+    if(error){ const m=error?.message||error?.code||''; if(m.includes('42P01')||m.includes('does not exist')) console.error('Table profiles manquante'); return _cache.users; }
+    const map = {};
+    (data||[]).forEach(p=>{ map[p.id]=mapProfile(p); });
+    _cache.users = map;
+    return map;
+  }
+
+  async function deleteProfile(id){
+    const { error } = await supabase.from('profiles').delete().eq('id',id);
+    if(error) throw error;
+    delete _cache.users[id];
+    notify();
+  }
+
+  let realtimeChannel = null;
+  function subscribeRealtime(){
+    if(!supabase||realtimeChannel) return;
+    try{
+      realtimeChannel = supabase.channel('public-changes')
+        .on('postgres_changes',{event:'*',schema:'public',table:'requests'},async()=>{ await loadRequests(); notify(); })
+        .on('postgres_changes',{event:'*',schema:'public',table:'messages'},async()=>{ await loadMessages(); notify(); })
+        .on('postgres_changes',{event:'*',schema:'public',table:'payments'},async()=>{ await loadPayments(); notify(); })
+        .on('postgres_changes',{event:'*',schema:'public',table:'profiles'},async()=>{ await loadAllProfiles(); notify(); })
+        .subscribe();
+    }catch(e){ console.warn('Realtime unavailable:', e?.message||e); }
+  }
+
+  return {
+    subscribe: fn => { _listeners.push(fn); return ()=>{ _listeners=_listeners.filter(f=>f!==fn); }; },
+    notify,
+    signUp, signIn, signOut, fetchProfile, updateProfile, deleteProfile, loadAllProfiles,
+    loadRequests, insertRequest, updateRequest,
+    loadMessages, insertMessage,
+    loadPayments, insertPayment, updatePayment,
+    subscribeRealtime,
+    getUsers:       () => _cache.users,
+    getCurrentUser: () => _cache.current,
+    setCurrentUser: u  => { _cache.current=u; notify(); },
+    getRequests:    () => _cache.requests,
+    getMessages:    () => _cache.messages,
+    getPayments:    () => _cache.payments,
+    setUsers:    u => { _cache.users=u; notify(); },
+    setRequests: r => { _cache.requests=r; notify(); },
+    setMessages: m => { _cache.messages=m; notify(); },
+    setPayments: p => { _cache.payments=p; notify(); },
+    isReady:     () => !!supabase,
+  };
+})();
+
+// ═══════════════════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════════════════
+var APP_NAME = 'Panne Solution';
+// Compte admin géré directement dans Supabase (role='admin' dans la table profiles)
+
+var PLANS = {
+  free:     { name:'Essai Gratuit',    price:0,    duration:30, color:'#64748B', icon:'🎁' },
+  tech_sub: { name:'Tech Pro',         price:2000, duration:30, color:'#FF6B2B', icon:'🔧' },
+  basic:    { name:'Basique',          price:1000, duration:30, color:'#FFB340', icon:'⭐' },
+  premium:  { name:'Premium',          price:5000, duration:30, color:'#00D37F', icon:'👑' },
+};
+var PAYMENT_METHODS = [
+  { id:'tmoney',     name:'T-Money',    number:'92643293', color:'#E53E3E', logo:'TM' },
+  { id:'moovafrica', name:'MoovAfrica', number:'97363832', color:'#2B6CB0', logo:'MA' },
+];
+var TECH_TYPES      = ['Mécanicien','Électricien','Dépanneur','Carrossier','Vulcanisateur'];
+var BREAKDOWN_TYPES = ['Panne moteur','Pneu crevé','Batterie déchargée','Panne électrique','Accident','Manque de carburant','Surchauffe moteur','Autre'];
+var BREAKDOWN_SPECIALTY_MAP = {
+  'Panne moteur':        ['Mécanicien','Dépanneur'],
+  'Pneu crevé':         ['Vulcanisateur','Dépanneur'],
+  'Batterie déchargée': ['Électricien','Dépanneur'],
+  'Panne électrique':   ['Électricien'],
+  'Accident':           ['Carrossier','Dépanneur'],
+  'Manque de carburant':['Dépanneur','Mécanicien'],
+  'Surchauffe moteur':  ['Mécanicien'],
+  'Autre':              ['Mécanicien','Électricien','Dépanneur','Carrossier','Vulcanisateur'],
+};
+var BREAKDOWN_ICONS = {
+  'Panne moteur':'⚙️','Pneu crevé':'🔄','Batterie déchargée':'🔋','Panne électrique':'⚡',
+  'Accident':'💥','Manque de carburant':'⛽','Surchauffe moteur':'🌡️','Autre':'🔧',
+};
+
+// ═══════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════
+function daysLeft(createdAt, duration){
+  if(!createdAt||!duration) return 0;
+  const elapsed=(Date.now()-createdAt)/(1000*60*60*24);
+  return Math.max(0,Math.ceil(duration-elapsed));
+}
+function isPlanActive(user){
+  if(!user) return false;
+  if(user.role==='admin') return true;
+  if(user.planStatus==='pending') return false;
+  const plan=PLANS[user.plan];
+  if(!plan) return false;
+  return daysLeft(user.planStart,plan.duration)>0;
+}
+function normalizeLocation(loc=''){
+  return loc.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s]/g,'').trim();
+}
+function sameLocality(locA='',locB=''){
+  const a=normalizeLocation(locA), b=normalizeLocation(locB);
+  if(!a||!b) return false;
+  const wa=a.split(/\s+/).filter(w=>w.length>2), wb=b.split(/\s+/).filter(w=>w.length>2);
+  return wa.some(x=>wb.some(y=>y.includes(x)||x.includes(y)));
+}
+function timeAgo(ts){
+  const diff=Date.now()-ts, m=Math.floor(diff/60000);
+  if(m<1) return 'À l\'instant';
+  if(m<60) return `Il y a ${m}min`;
+  const h=Math.floor(m/60);
+  if(h<24) return `Il y a ${h}h`;
+  return new Date(ts).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+}
+function requestMatchesTech(req,tech){
+  const sp=tech.specialty; if(!sp) return true;
+  if(req.techType&&req.techType===sp) return true;
+  const ms=BREAKDOWN_SPECIALTY_MAP[req.breakdownType]||[];
+  return ms.includes(sp);
+}
+function ic(name,size=20,color='currentColor'){
+  return `<svg width="${size}" height="${size}" style="display:inline-block;flex-shrink:0;vertical-align:middle;color:${color};stroke:${color}"><use href="#ic-${name}"/></svg>`;
+}
+function avatarHTML(user,size=44){
+  if(user?.photoUrl){
+    return `<div class="avatar" style="width:${size}px;height:${size}px;border:2px solid rgba(255,107,43,0.3)">\
+<img src="${user.photoUrl}" alt=""/></div>`;
+  }
+  const colors=[['#FF6B2B','#FF4500'],['#3B9EFF','#2563EB'],['#00D37F','#00A062'],['#8B5CF6','#6D28D9'],['#FFB340','#F59E0B']];
+  const idx=user?.name?user.name.charCodeAt(0)%colors.length:0;
+  const [c1,c2]=colors[idx];
+  const letter=(user?.name)?user.name[0].toUpperCase():'?';
+  return `<div class="avatar" style="width:${size}px;height:${size}px;background:linear-gradient(135deg,${c1},${c2});font-size:${Math.round(size*0.36)}px;color:#fff">${letter}</div>`;
+}
+function badge(text,color,solid=false){
+  const bg=solid?color:color+'1A';
+  const border=color+'33';
+  return `<span class="badge" style="background:${bg};color:${solid?'#fff':color};border:1px solid ${border}">${text}</span>`;
+}
+function tagSpan(text,color){
+  return `<span class="tag" style="background:${color}15;color:${color};border:1px solid ${color}25">${text}</span>`;
+}
+function stars(rating){
+  const r=Math.round(rating||0);
+  return Array.from({length:5},(_,i)=>`<svg width="12" height="12"><use href="#ic-star" style="color:${i<r?'#FFB340':'#334155'}"/></svg>`).join('');
+}
+
+// SOUND
+function playNotifSound(type='default'){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const cfgs={
+      success:[{f:523,s:0,d:0.1,v:0.3},{f:659,s:0.12,d:0.1,v:0.3},{f:784,s:0.24,d:0.18,v:0.25}],
+      alert:  [{f:880,s:0,d:0.08,v:0.35},{f:880,s:0.14,d:0.08,v:0.35},{f:660,s:0.28,d:0.18,v:0.3}],
+      message:[{f:880,s:0,d:0.07,v:0.2},{f:1108,s:0.09,d:0.1,v:0.18}],
+      default:[{f:660,s:0,d:0.15,v:0.25}],
+    };
+    (cfgs[type]||cfgs.default).forEach(({f,s,d,v})=>{
+      const osc=ctx.createOscillator(),g=ctx.createGain();
+      osc.connect(g);g.connect(ctx.destination);osc.type='sine';
+      osc.frequency.setValueAtTime(f,ctx.currentTime+s);
+      g.gain.setValueAtTime(0,ctx.currentTime+s);
+      g.gain.linearRampToValueAtTime(v,ctx.currentTime+s+0.02);
+      g.gain.linearRampToValueAtTime(0,ctx.currentTime+s+d);
+      osc.start(ctx.currentTime+s);osc.stop(ctx.currentTime+s+d+0.05);
+    });
+  }catch(e){}
+}
+
+var _toastTimer=null;
+function showToast(msg,type='info'){
+  playNotifSound(type==='success'?'success':type==='error'?'alert':'message');
+  const t=document.getElementById('toast');
+  const cfg={
+    success:{bg:'rgba(0,211,127,0.95)',border:'rgba(0,211,127,0.3)',icon:'check'},
+    error:  {bg:'rgba(255,61,90,0.95)',border:'rgba(255,61,90,0.3)',icon:'alert'},
+    warning:{bg:'rgba(255,179,64,0.95)',border:'rgba(255,179,64,0.3)',icon:'alert'},
+    info:   {bg:'rgba(255,107,43,0.95)',border:'rgba(255,107,43,0.3)',icon:'bell'},
+  };
+  const c=cfg[type]||cfg.info;
+  t.style.cssText=`background:${c.bg};border:1px solid ${c.border};border-radius:14px;padding:12px 16px;font-size:13px;font-weight:600;color:#fff;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,0.5);backdrop-filter:blur(20px)`;
+  t.innerHTML=`${ic(c.icon,16,'#fff')}<span style="flex:1">${msg}</span><button onclick="document.getElementById('toast').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,0.6);cursor:pointer;padding:0">${ic('close',14,'rgba(255,255,255,0.6)')}</button>`;
+  t.style.display='flex';
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>{ if(t) t.style.display='none'; },4500);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  APP STATE
+// ═══════════════════════════════════════════════════════════
+var APP = {
+  tab:'home', adminTab:'payments', activeChat:null,
+  userCoords:null, confirmModal:null,
+  profileEditing:false, profileForm:{},
+  techContactExpanded:{}, rejectReason:'',
+};
+var authMode='login';
+var authForm={ name:'',email:'',password:'',role:'driver',phone:'',specialty:'',garageName:'',garageLocation:'',photoUrl:null };
+var newReqForm={ breakdownType:'',techType:'',location:'',description:'',urgency:'normal',lat:null,lng:null };
+var newReqOpen=false;
+var payState={ step:1, plan:'basic', method:'tmoney', txRef:'' };
+var leafletInstance=null, leafletMarkers=[], userCoords=null;
+
+// ═══════════════════════════════════════════════════════════
+//  RENDER ENGINE
+// ═══════════════════════════════════════════════════════════
+var _rendering=false;
+async function render(){
+  if(_rendering) return;
+  _rendering=true;
+  try{
+    const app=document.getElementById('app');
+    APP.user=DB.getCurrentUser();
+    if(!APP.user){
+      try{
+        const { data:{ session } } = await supabase.auth.getSession();
+        if(session){ APP.user=await DB.fetchProfile(session.user.id); DB.setCurrentUser(APP.user); }
+      }catch(e){}
+    }
+    if(!APP.user){ app.innerHTML=renderAuthScreen(); bindAuthEvents(); return; }
+    if(APP.user.role==='admin'){ app.innerHTML=renderAdminDashboard(); bindAdminEvents(); return; }
+    if(APP.user.planStatus==='pending'){ app.innerHTML=renderPendingScreen(); return; }
+    if(!isPlanActive(APP.user)){ app.innerHTML=renderExpiredScreen(); bindExpiredEvents(); return; }
+    app.innerHTML=renderMainApp();
+    bindMainEvents();
+  }finally{ _rendering=false; }
+}
+
+async function safeLoad(fn, name){
+  try{ await fn(); }
+  catch(e){
+    let msg='';
+    try{ msg=String(e?.message||e?.code||''); }catch(_){}
+    if(msg&&(msg.includes('does not exist')||msg.includes('42P01'))){
+      console.error('Table "'+name+'" manquante.');
+    }
+  }
+}
+
+async function loadAllData(){
+  // Charger profiles en priorité, puis le reste en parallèle
+  await safeLoad(()=>DB.loadAllProfiles(),'profiles');
+  await Promise.all([
+    safeLoad(()=>DB.loadRequests(),'requests'),
+    safeLoad(()=>DB.loadMessages(),'messages'),
+    safeLoad(()=>DB.loadPayments(),'payments'),
+  ]);
+}
+
+async function loadEssentialData(){
+  // Chargement minimal pour afficher l'UI rapidement
+  await safeLoad(()=>DB.loadAllProfiles(),'profiles');
+}
+
+async function loadBackgroundData(){
+  // Chargement du reste en arrière-plan
+  await Promise.all([
+    safeLoad(()=>DB.loadRequests(),'requests'),
+    safeLoad(()=>DB.loadMessages(),'messages'),
+    safeLoad(()=>DB.loadPayments(),'payments'),
+  ]);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AUTH SCREEN
+// ═══════════════════════════════════════════════════════════
+function renderAuthScreen(){
+  const isReg=authMode==='register';
+  const isTech=authForm.role==='tech';
+  return `
+  <div class="auth-bg">
+    <div style="width:100%;max-width:420px">
+      <div style="text-align:center;margin-bottom:32px;animation:fadeUp 0.5s ease">
+        <div style="display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;background:linear-gradient(135deg,#FF6B2B,#FF4500);border-radius:22px;margin-bottom:16px;box-shadow:0 8px 40px rgba(255,107,43,0.4)">
+          ${ic('wrench',34,'#fff')}
+        </div>
+        <h1 style="font-size:30px;font-weight:900;background:linear-gradient(135deg,#FF6B2B,#FFB340);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:0;letter-spacing:-0.5px">${APP_NAME}</h1>
+        <p style="color:var(--text2);font-size:14px;margin-top:6px">Assistance routière intelligente</p>
+      </div>
+
+      <div class="card card-glow" style="animation:fadeUp 0.5s ease 0.1s both">
+        ${location.protocol==='file:'?`
+        <div style="background:rgba(255,179,64,0.1);border:1px solid rgba(255,179,64,0.3);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#FCD34D;line-height:1.7">
+          ⚠️ <strong>Fichier ouvert en local (file://)</strong><br/>
+          Supabase bloque les requêtes depuis <code>file://</code>. Pour que l'inscription fonctionne :<br/>
+          • <strong>Option 1</strong> : VS Code → installer <em>Live Server</em> → clic droit → "Open with Live Server"<br/>
+          • <strong>Option 2</strong> : déposez le fichier sur <a href="https://netlify.com/drop" target="_blank" style="color:#FCD34D;text-decoration:underline">netlify.com/drop</a> (gratuit, 30 sec)<br/>
+          • <strong>Option 3</strong> : <code>npx serve .</code> dans le dossier du fichier
+        </div>`:''}
+        <div class="auth-tabs">
+          <button class="auth-tab ${authMode==='login'?'active':''}" onclick="setAuthMode('login')">Se connecter</button>
+          <button class="auth-tab ${isReg?'active':''}" onclick="setAuthMode('register')">S'inscrire</button>
+        </div>
+
+        ${isReg?`
+        <div id="authRegFields">
+          <div class="inp-wrap" style="margin-bottom:10px">
+            <span class="inp-icon">${ic('user',16,'#445566')}</span>
+            <input class="inp" id="authName" placeholder="Nom complet" value="${authForm.name}" oninput="authForm.name=this.value"/>
+          </div>
+          <div class="inp-wrap" style="margin-bottom:10px">
+            <span class="inp-icon">${ic('phone',16,'#445566')}</span>
+            <input class="inp" id="authPhone" placeholder="Téléphone" value="${authForm.phone}" oninput="authForm.phone=this.value"/>
+          </div>
+          <select class="inp" id="authRole" style="margin-bottom:10px" onchange="authForm.role=this.value;renderAuthRoleFields()">
+            <option value="driver" ${authForm.role==='driver'?'selected':''}>🚗 Conducteur / Automobiliste</option>
+            <option value="tech" ${authForm.role==='tech'?'selected':''}>🔧 Technicien / Mécanicien</option>
+          </select>
+          <div id="authTechFields" style="display:${isTech?'block':'none'}">
+            <select class="inp" id="authSpecialty" style="margin-bottom:10px" onchange="authForm.specialty=this.value">
+              <option value="">-- Votre spécialité --</option>
+              ${TECH_TYPES.map(t=>`<option value="${t}" ${authForm.specialty===t?'selected':''}>${t}</option>`).join('')}
+            </select>
+            <input class="inp" id="authGarageName" placeholder="🏪 Nom du garage" style="margin-bottom:10px" value="${authForm.garageName}" oninput="authForm.garageName=this.value"/>
+            <input class="inp" id="authGarageLocation" placeholder="📍 Localisation du garage" style="margin-bottom:10px" value="${authForm.garageLocation}" oninput="authForm.garageLocation=this.value"/>
+            <div style="background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.2);border-radius:14px;padding:16px;margin-bottom:10px">
+              ${renderPhotoUpload('authPhoto',authForm.photoUrl,'📸 Photo professionnelle')}
+            </div>
+          </div>
+        </div>`:''}
+
+        <div class="inp-wrap" style="margin-bottom:10px">
+          <span class="inp-icon" style="top:50%;transform:translateY(-50%)">📧</span>
+          <input class="inp" id="authEmail" placeholder="Adresse email" type="email" value="${authForm.email}" oninput="authForm.email=this.value"/>
+        </div>
+        <div class="inp-wrap" style="margin-bottom:18px">
+          <span class="inp-icon" style="top:50%;transform:translateY(-50%)">🔒</span>
+          <input class="inp" id="authPassword" placeholder="Mot de passe (min 6 caractères)" type="password" value="${authForm.password}" oninput="authForm.password=this.value"/>
+        </div>
+
+        <button class="btn btn-primary btn-full" id="authSubmitBtn" onclick="handleAuthSubmit()">
+          ${authMode==='login'?ic('zap',16,'#fff')+' Se connecter':ic('user',16,'#fff')+' Créer mon compte'}
+        </button>
+
+        ${isReg?`<p style="text-align:center;color:var(--text3);font-size:12px;margin-top:12px">✅ 30 jours d'essai gratuit · Sans carte bancaire</p>`:''}
+
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPhotoUpload(id,photoUrl,label){
+  return `
+  <div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px;font-weight:700">${label}</div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="photo-circle" onclick="document.getElementById('${id}FileInput').click()">
+        ${photoUrl?`<img src="${photoUrl}" style="width:100%;height:100%;object-fit:cover"/>`:`<div style="text-align:center">${ic('camera',22,'#8B5CF6')}<div style="font-size:8px;color:var(--accent);font-weight:800;margin-top:3px">AJOUTER</div></div>`}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <button type="button" onclick="document.getElementById('${id}FileInput').click()" class="btn btn-ghost btn-sm" style="justify-content:flex-start">
+          ${ic('image',13,'#8B5CF6')} ${photoUrl?'Changer la photo':'Choisir'}
+        </button>
+        ${photoUrl?`<button type="button" onclick="clearPhoto('${id}')" class="btn btn-sm" style="background:rgba(255,61,90,0.1);color:var(--red);border:1px solid rgba(255,61,90,0.2);justify-content:flex-start">${ic('trash',12,'var(--red)')} Supprimer</button>`:''}
+        <span style="color:var(--text3);font-size:10px">JPG, PNG · Max 2 Mo</span>
+      </div>
+    </div>
+    <input type="file" id="${id}FileInput" accept="image/*" style="display:none" onchange="handlePhotoUpload('${id}',this)"/>
+  </div>`;
+}
+
+function setAuthMode(mode){ authMode=mode; render(); }
+function renderAuthRoleFields(){
+  const f=document.getElementById('authTechFields');
+  if(f) f.style.display=authForm.role==='tech'?'block':'none';
+}
+function handlePhotoUpload(id,input){
+  const file=input.files[0];
+  if(!file||!file.type.startsWith('image/')) return;
+  if(file.size>2*1024*1024){ showToast('La photo dépasse 2 Mo','error'); return; }
+  const r=new FileReader();
+  r.onload=ev=>{
+    if(id==='authPhoto') authForm.photoUrl=ev.target.result;
+    else if(id==='profilePhoto') APP.profileForm.photoUrl=ev.target.result;
+    render();
+  };
+  r.readAsDataURL(file);
+}
+function clearPhoto(id){
+  if(id==='authPhoto') authForm.photoUrl=null;
+  else if(id==='profilePhoto') APP.profileForm.photoUrl=null;
+  render();
+}
+function bindAuthEvents(){
+  const p=document.getElementById('authPassword');
+  if(p) p.addEventListener('keydown',e=>{ if(e.key==='Enter') handleAuthSubmit(); });
+  const em=document.getElementById('authEmail');
+  if(em) em.addEventListener('keydown',e=>{ if(e.key==='Enter') handleAuthSubmit(); });
+}
+function handleAuthSubmit(){ authMode==='login'?handleLogin():handleRegister(); }
+
+function handleLogin(){
+  const emailRaw=(document.getElementById('authEmail')||{value:authForm.email}).value.trim();
+  const email=emailRaw.toLowerCase();
+  const pass=(document.getElementById('authPassword')||{value:authForm.password}).value;
+  const btn=document.getElementById('authSubmitBtn');
+  if(!email||!pass){ showToast('Remplissez tous les champs','error'); return; }
+
+  // ── Connexion via Supabase (admin détecté par role='admin' dans profiles) ──
+  if(btn){ btn.disabled=true; btn.innerHTML='⏳ Connexion...'; }
+  DB.signIn(email,pass)
+    .then(async()=>{ await loadAllData(); render(); })
+    .catch(e=>{
+      const msg=(e?.message||e?.msg||JSON.stringify(e)||'').toLowerCase();
+      const raw=e?.message||e?.msg||JSON.stringify(e)||'Inconnue';
+      if(msg.includes('invalid')||msg.includes('credentials')||msg.includes('password')||msg.includes('wrong')){
+        showToast('Email ou mot de passe incorrect','error');
+      } else if(msg.includes('confirmed')||msg.includes('confirm')||msg.includes('verif')){
+        showToast('Confirmez votre email avant de vous connecter','error');
+      } else if(msg.includes('fetch')||msg.includes('network')||msg.includes('failed')){
+        showToast('Erreur réseau : '+raw,'error');
+      } else {
+        showToast('Erreur : '+raw,'error');
+      }
+      if(btn){btn.disabled=false;btn.innerHTML=ic('zap',16,'#fff')+' Se connecter';}
+    });
+}
+
+function handleRegister(){
+  const name=(document.getElementById('authName')||{value:authForm.name}).value.trim();
+  const email=(document.getElementById('authEmail')||{value:authForm.email}).value.trim();
+  const pass=(document.getElementById('authPassword')||{value:authForm.password}).value;
+  const phone=(document.getElementById('authPhone')||{value:authForm.phone}).value.trim();
+  const role=(document.getElementById('authRole')||{value:authForm.role}).value;
+  const specialty=(document.getElementById('authSpecialty')||{value:authForm.specialty}).value;
+  const garageName=(document.getElementById('authGarageName')||{value:authForm.garageName}).value.trim();
+  const garageLocation=(document.getElementById('authGarageLocation')||{value:authForm.garageLocation}).value.trim();
+  if(!name||!email||!pass){ showToast('Remplissez tous les champs obligatoires','error'); return; }
+  if(pass.length<6){ showToast('Mot de passe : 6 caractères minimum','error'); return; }
+  if(role==='tech'&&!specialty){ showToast('Choisissez votre spécialité','error'); return; }
+  if(role==='tech'&&!garageName){ showToast('Entrez le nom du garage','error'); return; }
+  if(role==='tech'&&!garageLocation){ showToast('Entrez la localisation du garage','error'); return; }
+  const btn=document.getElementById('authSubmitBtn');
+  if(btn){ btn.disabled=true; btn.innerHTML='⏳ Création...'; }
+  DB.signUp(email,pass,{
+    name,role,phone,specialty,
+    garage_name:garageName,garage_location:garageLocation,
+    location:role==='tech'?garageLocation:'Lomé, Togo',
+    photo_url:role==='tech'?authForm.photoUrl:null,
+  }).then(async()=>{
+    await loadAllData();
+    showToast('Compte créé ! 30 jours d\'essai offerts 🎉','success');
+    render();
+  }).catch(e=>{
+    const msg=e.message||'';
+    if(msg.includes('already')) showToast('Email déjà utilisé','error');
+    else showToast('Erreur : '+(msg||'Réessayez'),'error');
+    if(btn){btn.disabled=false;btn.innerHTML=ic('user',16,'#fff')+' Créer mon compte';}
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PENDING SCREEN
+// ═══════════════════════════════════════════════════════════
+function renderPendingScreen(){
+  const user=APP.user;
+  const payments=DB.getPayments();
+  const pending=payments.find(p=>p.id===user.pendingPaymentId);
+  const planInfo=PLANS[user.pendingPlan]||PLANS.basic;
+  return `
+  <div class="centered-screen">
+    <div class="card card-glow" style="max-width:400px;text-align:center;animation:fadeUp 0.4s ease">
+      <div style="font-size:52px;margin-bottom:16px;animation:pulse 2s infinite">⏳</div>
+      <h2 style="font-size:20px;font-weight:800;color:var(--yellow);margin:0 0 8px">Vérification en cours</h2>
+      <p style="color:var(--text2);margin-bottom:20px;font-size:14px;line-height:1.7">Votre paiement est soumis. L'administrateur va l'activer sous <strong style="color:var(--text)">24h</strong>.</p>
+      ${pending?`
+      <div style="background:rgba(255,179,64,0.07);border:1px solid rgba(255,179,64,0.2);border-radius:14px;padding:16px;margin-bottom:20px;text-align:left">
+        ${[['Plan',planInfo.name],['Montant',`${pending.amount.toLocaleString()} CFA`],['Méthode',pending.methodName],['Réf. TX',pending.txRef],['Soumis',new Date(pending.createdAt).toLocaleString('fr-FR')]].map(([k,v])=>`
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px">
+          <span style="color:var(--text2)">${k}</span><span style="font-weight:700;color:var(--text)">${v}</span>
+        </div>`).join('')}
+        <div style="display:flex;justify-content:space-between;font-size:13px">
+          <span style="color:var(--text2)">Statut</span><span style="color:var(--yellow);font-weight:700">⏳ En attente</span>
+        </div>
+      </div>`:''}
+      <button class="btn btn-ghost btn-full" onclick="handleLogout()">Se déconnecter</button>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  EXPIRED SCREEN
+// ═══════════════════════════════════════════════════════════
+function renderExpiredScreen(){
+  return `
+  <div class="centered-screen">
+    <div class="card card-glow" style="max-width:380px;text-align:center;animation:fadeUp 0.4s ease">
+      <div style="font-size:48px;margin-bottom:16px">⏰</div>
+      <h2 style="font-size:22px;font-weight:800;color:var(--red);margin:0 0 10px">Période d'essai expirée</h2>
+      <p style="color:var(--text2);margin-bottom:24px;font-size:14px">Souscrivez pour continuer à utiliser ${APP_NAME}.</p>
+      <button class="btn btn-primary btn-full" style="margin-bottom:10px" onclick="openPaymentModal()">🚀 Choisir un plan</button>
+      <button class="btn btn-ghost btn-full" onclick="handleLogout()">Se déconnecter</button>
+    </div>
+    ${renderPaymentModal()}
+  </div>`;
+}
+function bindExpiredEvents(){ bindPaymentModalEvents(); }
+
+// ═══════════════════════════════════════════════════════════
+//  PAYMENT MODAL
+// ═══════════════════════════════════════════════════════════
+function renderPaymentModal(){
+  const selPlan=PLANS[payState.plan];
+  const selMethod=PAYMENT_METHODS.find(m=>m.id===payState.method);
+  return `
+  <div class="modal-overlay" id="paymentModal">
+    <div class="modal-box">
+      <button onclick="closePaymentModal()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.06);border:none;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2)">${ic('close',16)}</button>
+      <h2 style="margin:0 0 4px;font-size:20px;font-weight:800">💳 Souscrire</h2>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:18px">Débloquez toutes les fonctionnalités</p>
+      <div style="display:flex;gap:8px;margin-bottom:22px;align-items:center">
+        ${[1,2].map(s=>`<div style="height:4px;flex:1;border-radius:4px;background:${payState.step>=s?'var(--accent)':'rgba(255,255,255,0.07)'};transition:background 0.3s"></div>`).join('')}
+        <span style="font-size:11px;font-weight:700;color:var(--text2)">Étape ${payState.step}/2</span>
+      </div>
+      ${payState.step===1?renderPayStep1():renderPayStep2(selPlan,selMethod)}
+    </div>
+  </div>`;
+}
+
+function renderPayStep1(){
+  const user=APP.user;
+  const isTech=user&&user.role==='tech';
+  const plans=isTech?[['tech_sub']]:[ ['basic'],['premium'] ];
+  return `
+  <p style="color:var(--text2);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px">Choisissez votre plan</p>
+  ${isTech?`<div style="background:rgba(255,107,43,0.07);border:1px solid rgba(255,107,43,0.2);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:#FED7AA;line-height:1.6">
+    💡 En tant que technicien, restez visible 30 jours pour <strong style="color:var(--accent)">2 000 CFA/mois</strong>.
+  </div>`:''}
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+    ${plans.map(([key])=>{
+      const pl=PLANS[key];
+      const sel=payState.plan===key;
+      return `
+      <div class="plan-card ${sel?'selected':''}" onclick="payState.plan='${key}';reRenderPayModal()" style="border-color:${sel?pl.color:'rgba(255,255,255,0.07)'}">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:800;font-size:16px;margin-bottom:2px">${pl.icon} ${pl.name}</div>
+            <div style="color:var(--text2);font-size:12px">Accès complet · ${pl.duration} jours renouvelables</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:900;font-size:22px;color:${pl.color};font-family:'Space Grotesk',sans-serif">${pl.price.toLocaleString()}</div>
+            <div style="font-size:11px;color:var(--text2);font-weight:600">CFA</div>
+          </div>
+        </div>
+        ${sel?`<div style="margin-top:8px;display:flex;align-items:center;gap:6px;color:${pl.color};font-size:12px;font-weight:700">${ic('check',14,pl.color)} Plan sélectionné</div>`:''}
+      </div>`;
+    }).join('')}
+  </div>
+  <button class="btn btn-primary btn-full" onclick="payState.step=2;reRenderPayModal()">Continuer → Paiement</button>`;
+}
+
+function renderPayStep2(selPlan,selMethod){
+  return `
+  <button class="btn btn-ghost btn-sm" style="margin-bottom:16px" onclick="payState.step=1;reRenderPayModal()">← Retour</button>
+  <p style="color:var(--text2);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px">Mode de paiement</p>
+  <div style="display:grid;gap:9px;margin-bottom:14px">
+    ${PAYMENT_METHODS.map(m=>{
+      const sel=payState.method===m.id;
+      return `
+      <div onclick="payState.method='${m.id}';reRenderPayModal()" style="border:2px solid ${sel?m.color:'rgba(255,255,255,0.07)'};border-radius:13px;padding:14px 16px;cursor:pointer;background:${sel?m.color+'0D':'transparent'};display:flex;align-items:center;gap:12px;transition:all 0.2s">
+        <div style="width:40px;height:40px;border-radius:10px;background:${m.color};display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:12px;flex-shrink:0">${m.logo}</div>
+        <div style="flex:1"><div style="font-weight:700">${m.name}</div><div style="color:var(--text2);font-size:12px">Numéro : <strong style="color:var(--text)">${m.number}</strong></div></div>
+        ${sel?`<div style="width:22px;height:22px;background:${m.color};border-radius:50%;display:flex;align-items:center;justify-content:center">${ic('check',12,'#fff')}</div>`:''}
+      </div>`;
+    }).join('')}
+  </div>
+  <div style="background:rgba(255,107,43,0.07);border:1px solid rgba(255,107,43,0.2);border-radius:13px;padding:14px;margin-bottom:14px">
+    <p style="margin:0;font-size:13px;color:var(--text2);line-height:1.9">
+      📲 Envoyez <strong style="color:var(--text)">${selPlan.price.toLocaleString()} CFA</strong> au
+      <strong style="color:${selMethod.color}">${selMethod.number}</strong> (${selMethod.name})<br/>
+      puis saisissez la <strong style="color:var(--text)">référence de transaction</strong> ci-dessous.
+    </p>
+  </div>
+  <div style="background:rgba(255,255,255,0.04);border-radius:11px;padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+    <span style="color:var(--text2);font-size:13px">Plan sélectionné</span>
+    <span style="font-weight:800;color:${selPlan.color}">${selPlan.icon} ${selPlan.name} — ${selPlan.price.toLocaleString()} CFA</span>
+  </div>
+  <input class="inp" id="payTxRef" placeholder="Référence transaction (ex: TXN123456)" style="margin-bottom:14px" value="${payState.txRef}" oninput="payState.txRef=this.value"/>
+  <button class="btn btn-green btn-full" id="paySubmitBtn" onclick="handlePaySubmit()">
+    ${ic('send',16,'#fff')} Soumettre le paiement
+  </button>
+  <p style="text-align:center;color:var(--text3);font-size:11px;margin-top:10px">Activation sous 24h après validation admin.</p>`;
+}
+
+function reRenderPayModal(){
+  const modal=document.getElementById('paymentModal');
+  if(modal){ modal.outerHTML=renderPaymentModal(); bindPaymentModalEvents(); }
+  else render();
+}
+function openPaymentModal(){
+  const defaultPlan=APP.user&&APP.user.role==='tech'?'tech_sub':'basic';
+  payState={step:1,plan:defaultPlan,method:'tmoney',txRef:''};
+  const m=document.getElementById('paymentModal');
+  if(m) m.classList.add('open');
+}
+function closePaymentModal(){ const m=document.getElementById('paymentModal'); if(m) m.classList.remove('open'); }
+function bindPaymentModalEvents(){
+  const m=document.getElementById('paymentModal');
+  if(m) m.addEventListener('click',e=>{ if(e.target===m) closePaymentModal(); });
+}
+function handlePaySubmit(){
+  const txRef=(document.getElementById('payTxRef')||{value:payState.txRef}).value.trim();
+  if(!txRef){ showToast('Entrez la référence de transaction','error'); return; }
+  const user=APP.user;
+  const selMethod=PAYMENT_METHODS.find(m=>m.id===payState.method);
+  const btn=document.getElementById('paySubmitBtn');
+  if(btn){ btn.disabled=true; btn.innerHTML='⏳ Envoi...'; }
+  DB.insertPayment({
+    userId:user.id, userName:user.name, userEmail:user.email,
+    plan:payState.plan, planName:PLANS[payState.plan].name,
+    method:payState.method, methodName:selMethod.name,
+    txRef, amount:PLANS[payState.plan].price,
+  }).then(async saved=>{
+    await DB.updateProfile(user.id,{pendingPlan:payState.plan,pendingPaymentId:saved.id,planStatus:'pending'});
+    await loadAllData();
+    showToast('Paiement soumis ! En attente de validation.','warning');
+    render();
+  }).catch(e=>{ showToast('Erreur lors de la soumission','error'); if(btn){btn.disabled=false;btn.innerHTML=ic('send',16,'#fff')+' Soumettre le paiement';} });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ADMIN DASHBOARD
+// ═══════════════════════════════════════════════════════════
+function renderAdminDashboard(){
+  const payments=DB.getPayments();
+  const users=DB.getUsers();
+  const requests=DB.getRequests();
+  const pending=payments.filter(p=>p.status==='pending');
+  const approved=payments.filter(p=>p.status==='approved');
+  const rejected=payments.filter(p=>p.status==='rejected');
+  const nonAdmin=Object.values(users).filter(u=>u.role!=='admin');
+  const totalRevenue=approved.reduce((s,p)=>s+p.amount,0);
+
+  const NAV=[
+    {id:'payments',ic:'dollar',label:'Paiements',badge:pending.length},
+    {id:'users',ic:'users',label:'Utilisateurs'},
+    {id:'requests',ic:'tool',label:'Pannes'},
+    {id:'stats',ic:'shield',label:'Stats'},
+  ];
+
+  let content='';
+  if(APP.adminTab==='payments'){
+    content=`
+    <h3 style="font-weight:800;margin-bottom:16px;font-size:18px">💳 Gestion des paiements</h3>
+    <div class="grid3" style="margin-bottom:20px">
+      ${[['En attente',pending.length,'#FFB340'],['Approuvés',approved.length,'#00D37F'],['Rejetés',rejected.length,'#FF3D5A']].map(([l,c,col])=>`
+      <div class="stat-card"><div class="stat-num" style="color:${col}">${c}</div><div class="stat-label">${l}</div></div>`).join('')}
+    </div>
+    ${pending.length>0?`
+    <div style="margin-bottom:24px">
+      <div class="section-title">${ic('alert',14,'#FFB340')}<span style="color:#FFB340">En attente (${pending.length})</span></div>
+      ${pending.map(p=>renderPaymentCard(p,users,false)).join('')}
+    </div>`:''}
+    ${[...approved,...rejected].length>0?`
+    <div class="section-title" style="margin-top:4px">${ic('refresh',14,'var(--text2)')} Historique</div>
+    ${[...approved,...rejected].sort((a,b)=>(b.reviewedAt||0)-(a.reviewedAt||0)).map(p=>renderPaymentCard(p,users,true)).join('')}`:''}
+    ${payments.length===0?`<div class="card" style="text-align:center;padding:40px;color:var(--text2)"><div style="font-size:44px;margin-bottom:8px">💳</div><p>Aucun paiement soumis.</p></div>`:''}`;
+  }
+  else if(APP.adminTab==='users'){
+    content=`
+    <h3 style="font-weight:800;margin-bottom:16px;font-size:18px">👥 Utilisateurs (${nonAdmin.length})</h3>
+    ${nonAdmin.length===0?`<div class="card" style="text-align:center;padding:40px;color:var(--text2)"><div style="font-size:44px;margin-bottom:8px">👥</div><p>Aucun utilisateur.</p></div>`:
+    nonAdmin.map(u=>{
+      const plan=PLANS[u.plan]||PLANS.free;
+      const rem=daysLeft(u.planStart,plan.duration);
+      return `
+      <div class="card" style="margin-bottom:10px;display:flex;align-items:center;gap:14px">
+        ${avatarHTML(u,44)}
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap">${u.name}${u.planStatus==='pending'?badge('Pending','#FFB340'):''}</div>
+          <div style="color:var(--text2);font-size:12px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email}</div>
+          <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+            ${badge(plan.icon+' '+plan.name,plan.color)}
+            ${tagSpan(rem+'j restants',rem>7?'#00D37F':rem>0?'#FFB340':'#FF3D5A')}
+            ${badge(u.role==='tech'?'🔧 Tech':'🚗 Driver','#8B5CF6')}
+          </div>
+        </div>
+        <button onclick="adminDeleteUser('${u.id}')" class="btn btn-sm" style="background:rgba(255,61,90,0.1);color:var(--red);border:1px solid rgba(255,61,90,0.2)">${ic('trash',14,'var(--red)')}</button>
+      </div>`;
+    }).join('')}`;
+  }
+  else if(APP.adminTab==='requests'){
+    const reqs=DB.getRequests();
+    const statusConfig={open:{color:'#FFB340',label:'En attente'},assigned:{color:'#8B5CF6',label:'Pris en charge'},resolved:{color:'#00D37F',label:'Résolu'}};
+    content=`
+    <h3 style="font-weight:800;margin-bottom:16px;font-size:18px">🔧 Signalements (${reqs.length})</h3>
+    ${reqs.length===0?`<div class="card" style="text-align:center;padding:40px;color:var(--text2)"><div style="font-size:44px;margin-bottom:8px">🔧</div><p>Aucune demande.</p></div>`:
+    [...reqs].sort((a,b)=>b.createdAt-a.createdAt).map(req=>{
+      const sc=statusConfig[req.status]||{color:'#64748B',label:req.status};
+      return `
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <div style="font-weight:700;display:flex;align-items:center;gap:8px">${BREAKDOWN_ICONS[req.breakdownType]||'🔧'} ${req.breakdownType}</div>
+          ${badge(sc.label,sc.color)}
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+          ${tagSpan('📍 '+req.location,'#8B5CF6')}${tagSpan('👤 '+req.userName,'#FFB340')}
+          ${req.urgency==='urgent'?tagSpan('🔴 Urgent','#FF3D5A'):''}
+        </div>
+        <div style="color:var(--text3);font-size:11px">${timeAgo(req.createdAt)}</div>
+      </div>`;
+    }).join('')}`;
+  }
+  else if(APP.adminTab==='stats'){
+    const techs=nonAdmin.filter(u=>u.role==='tech');
+    const drivers=nonAdmin.filter(u=>u.role==='driver');
+    const reqs=DB.getRequests();
+    content=`
+    <h3 style="font-weight:800;margin-bottom:16px;font-size:18px">📊 Statistiques</h3>
+    <div class="grid2">
+      ${[
+        ['💰 Revenus',`${totalRevenue.toLocaleString()} CFA`,'#00D37F'],
+        ['👥 Utilisateurs',nonAdmin.length,'#3B9EFF'],
+        ['🔧 Techniciens',techs.length,'#FFB340'],
+        ['🚗 Conducteurs',drivers.length,'#FF6B2B'],
+        ['📋 Pannes totales',reqs.length,'#8B5CF6'],
+        ['✅ Résolues',reqs.filter(r=>r.status==='resolved').length,'#00D37F'],
+      ].map(([l,v,c])=>`<div class="stat-card"><div class="stat-num" style="color:${c}">${v}</div><div class="stat-label">${l}</div></div>`).join('')}
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="section-title">${ic('zap',14,'#FFB340')} Pannes par type</div>
+      ${BREAKDOWN_TYPES.map(bt=>{
+        const count=reqs.filter(r=>r.breakdownType===bt).length;
+        const pct=reqs.length?Math.round((count/reqs.length)*100):0;
+        return `
+        <div style="margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+            <span>${BREAKDOWN_ICONS[bt]||'🔧'} ${bt}</span><span style="font-weight:700;color:var(--accent)">${count}</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:linear-gradient(90deg,#FF6B2B,#FFB340)"></div></div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  let confirmHtml='';
+  if(APP.confirmModal){
+    const cm=APP.confirmModal;
+    confirmHtml=`
+    <div class="modal-overlay open" id="adminConfirmModal">
+      <div class="modal-box" style="max-width:420px">
+        ${cm.type==='approve'?`
+        <h3 style="margin:0 0 6px;font-weight:800;color:var(--green);font-size:18px">✅ Approuver le paiement</h3>
+        <p style="color:var(--text2);margin-bottom:16px;font-size:14px">Activer le plan <strong style="color:${PLANS[cm.payment.plan]?.color||'#fff'}">${cm.payment.planName}</strong> pour <strong style="color:var(--text)">${cm.payment.userName}</strong> ?</p>
+        <div style="background:rgba(0,211,127,0.07);border:1px solid rgba(0,211,127,0.2);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13px;display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Réf. TX</span><strong>${cm.payment.txRef}</strong></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Montant</span><strong style="color:var(--green)">${cm.payment.amount.toLocaleString()} CFA</strong></div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost" style="flex:1" onclick="APP.confirmModal=null;render()">Annuler</button>
+          <button class="btn btn-green" style="flex:1" onclick="adminApprovePayment()">${ic('check',16,'#fff')} Confirmer</button>
+        </div>`:`
+        <h3 style="margin:0 0 6px;font-weight:800;color:var(--red);font-size:18px">❌ Rejeter le paiement</h3>
+        <p style="color:var(--text2);margin-bottom:16px;font-size:14px">Rejeter le paiement de <strong style="color:var(--text)">${cm.payment.userName}</strong> ?</p>
+        <input class="inp" id="adminRejectReason" placeholder="Motif du rejet (optionnel)" style="margin-bottom:16px" value="${APP.rejectReason||''}" oninput="APP.rejectReason=this.value"/>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost" style="flex:1" onclick="APP.confirmModal=null;APP.rejectReason='';render()">Annuler</button>
+          <button class="btn btn-red" style="flex:1" onclick="adminRejectPayment()">${ic('trash',16,'#fff')} Rejeter</button>
+        </div>`}
+      </div>
+    </div>`;
+  }
+
+  return `
+  <div style="display:flex;flex-direction:column;min-height:100vh">
+    <div class="sticky-header" style="border-bottom-color:rgba(139,92,246,0.15)">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:38px;height:38px;background:linear-gradient(135deg,#8B5CF6,#6D28D9);border-radius:11px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(139,92,246,0.35)">${ic('shield',18,'#fff')}</div>
+        <div>
+          <div style="font-weight:800;font-size:15px">Dashboard Admin</div>
+          <div style="font-size:11px;color:var(--text2)">${APP_NAME} · Panneau de contrôle</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        ${pending.length>0?`<div style="background:rgba(255,61,90,0.12);border:1px solid rgba(255,61,90,0.25);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--red);font-weight:700;display:flex;align-items:center;gap:6px;animation:pulse 2s infinite"><span style="width:6px;height:6px;background:var(--red);border-radius:50%;display:inline-block"></span>${pending.length} en attente</div>`:''}
+        <button class="btn btn-sm" style="background:rgba(255,61,90,0.1);color:var(--red);border:1px solid rgba(255,61,90,0.2);display:flex;align-items:center;gap:6px" onclick="handleLogout()">${ic('logout',14,'var(--red)')} Quitter</button>
+      </div>
+    </div>
+    <div class="admin-content">${content}</div>
+    <div class="bottom-nav">
+      <div class="nav-inner">
+        ${NAV.map(n=>`
+        <button class="nav-btn ${APP.adminTab===n.id?'active':''}" onclick="APP.adminTab='${n.id}';render()" style="color:${APP.adminTab===n.id?'#8B5CF6':'var(--text3)'}">
+          ${ic(n.ic,22,APP.adminTab===n.id?'#8B5CF6':'var(--text3)')}
+          <span class="nav-label">${n.label}</span>
+          ${(n.badge||0)>0?`<span class="nav-badge">${n.badge}</span>`:''}
+          ${APP.adminTab===n.id?`<div class="nav-indicator" style="background:#8B5CF6;opacity:1"></div>`:''}
+        </button>`).join('')}
+      </div>
+    </div>
+    ${confirmHtml}
+  </div>`;
+}
+
+function renderPaymentCard(p,users,readonly){
+  const u=users[p.userId];
+  const sc={pending:'#FFB340',approved:'#00D37F',rejected:'#FF3D5A'}[p.status];
+  const sl={pending:'⏳ En attente',approved:'✅ Approuvé',rejected:'❌ Rejeté'}[p.status];
+  const pc=PLANS[p.plan]?.color||'#64748B';
+  return `
+  <div class="card" style="margin-bottom:10px;border-color:${sc}22">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        ${avatarHTML(u||{name:p.userName},40)}
+        <div><div style="font-weight:700">${p.userName}</div><div style="color:var(--text2);font-size:12px">${p.userEmail}</div></div>
+      </div>
+      ${badge(sl,sc)}
+    </div>
+    <div class="grid2" style="margin-bottom:10px;font-size:13px;gap:8px">
+      ${[['Plan',`<span style="color:${pc};font-weight:700">${p.planName}</span>`],['Montant',`<span style="color:var(--green);font-weight:700">${p.amount.toLocaleString()} CFA</span>`],['Méthode',p.methodName],['Réf. TX',`<strong style="color:var(--text)">${p.txRef}</strong>`],['Soumis',timeAgo(p.createdAt)],p.reviewedAt?['Traité',timeAgo(p.reviewedAt)]:null].filter(Boolean).map(([k,v])=>`
+      <div style="background:rgba(255,255,255,0.03);border-radius:9px;padding:9px 11px;border:1px solid var(--border2)"><div style="color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:3px">${k}</div><div>${v}</div></div>`).join('')}
+    </div>
+    ${p.rejectReason?`<div style="background:rgba(255,61,90,0.07);border:1px solid rgba(255,61,90,0.2);border-radius:9px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--red)">Motif : ${p.rejectReason}</div>`:''}
+    ${!readonly&&p.status==='pending'?`
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-sm" style="background:rgba(255,61,90,0.1);color:var(--red);border:1px solid rgba(255,61,90,0.2);flex:1" onclick="APP.confirmModal={type:'reject',payment:${JSON.stringify(p).replace(/"/g,'&quot;')}};render()">❌ Rejeter</button>
+      <button class="btn btn-green btn-sm" style="flex:1" onclick="APP.confirmModal={type:'approve',payment:${JSON.stringify(p).replace(/"/g,'&quot;')}};render()">✅ Approuver</button>
+    </div>`:''}
+  </div>`;
+}
+
+function bindAdminEvents(){
+  const m=document.getElementById('adminConfirmModal');
+  if(m) m.addEventListener('click',e=>{ if(e.target===m){APP.confirmModal=null;render();} });
+}
+
+function adminApprovePayment(){
+  const p=APP.confirmModal.payment;
+  DB.updatePayment(p.id,{status:'approved',reviewedAt:Date.now(),reviewedBy:'admin'})
+    .then(()=>DB.updateProfile(p.userId,{plan:p.plan,planStart:Date.now(),planStatus:'active',pendingPlan:null,pendingPaymentId:null}))
+    .then(()=>loadAllData())
+    .then(()=>{ APP.confirmModal=null; showToast(`✅ Plan ${p.planName} activé pour ${p.userName}`,'success'); render(); })
+    .catch(e=>showToast('Erreur : '+(e.message||e),'error'));
+}
+function adminRejectPayment(){
+  const p=APP.confirmModal.payment;
+  const reason=APP.rejectReason||'';
+  DB.updatePayment(p.id,{status:'rejected',reviewedAt:Date.now(),reviewedBy:'admin',rejectReason:reason})
+    .then(()=>DB.updateProfile(p.userId,{planStatus:'active',plan:'free',pendingPlan:null,pendingPaymentId:null}))
+    .then(()=>loadAllData())
+    .then(()=>{ APP.confirmModal=null; APP.rejectReason=''; showToast(`❌ Paiement de ${p.userName} rejeté`,'warning'); render(); })
+    .catch(e=>showToast('Erreur : '+(e.message||e),'error'));
+}
+function adminDeleteUser(uid){
+  if(!confirm('Supprimer cet utilisateur ?')) return;
+  DB.deleteProfile(uid).then(()=>loadAllData()).then(()=>{ showToast('Utilisateur supprimé','info'); render(); })
+    .catch(e=>showToast('Erreur : '+(e.message||e),'error'));
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MAIN APP
+// ═══════════════════════════════════════════════════════════
+function renderMainApp(){
+  const user=APP.user;
+  const planInfo=PLANS[user.plan]||PLANS.free;
+  const remaining=daysLeft(user.planStart,planInfo.duration);
+  const messages=DB.getMessages();
+  const unreadCount=messages.reduce((acc,m)=>{
+    if(!m.participants.includes(user.id)) return acc;
+    return acc+m.messages.filter(msg=>msg.from!==user.id&&!msg.read).length;
+  },0);
+
+  const NAV=[
+    {id:'home',ic:user.role==='tech'?'wrench':'car',label:user.role==='tech'?'Missions':'Accueil'},
+    {id:'map',ic:'map',label:'Carte'},
+    {id:'chat',ic:'chat',label:'Messages',badge:unreadCount},
+    {id:'profile',ic:'user',label:'Profil'},
+  ];
+
+  let content='';
+  if(APP.tab==='home') content=renderHomeTab(user);
+  else if(APP.tab==='map') content=renderMapTab(user);
+  else if(APP.tab==='chat') content=renderChatTab(user);
+  else if(APP.tab==='profile') content=renderProfileTab(user);
+
+  return `
+  <div style="display:flex;flex-direction:column;min-height:100vh">
+    <div class="sticky-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="logo-mark">${ic('wrench',18,'#fff')}</div>
+        <div>
+          <div style="font-weight:800;font-size:15px;letter-spacing:-0.3px">${APP_NAME}</div>
+          <div style="font-size:11px;color:var(--text2)">Bonjour, ${user.name.split(' ')[0]} 👋</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${badge(planInfo.icon+' '+(user.plan==='free'?`${remaining}j essai`:planInfo.name),planInfo.color)}
+        ${user.plan==='free'&&remaining<8?`<button class="btn btn-primary btn-sm" onclick="openPaymentModal()">⬆️ Upgrader</button>`:''}
+      </div>
+    </div>
+
+    <div class="content">${content}</div>
+
+    ${APP.tab==='home'&&user.role==='driver'?`<button class="fab" onclick="openNewRequest()" title="Signaler une panne">🆘</button>`:''}
+
+    <div class="bottom-nav">
+      <div class="nav-inner">
+        ${NAV.map(n=>`
+        <button class="nav-btn ${APP.tab===n.id?'active':''}" onclick="setTab('${n.id}')">
+          ${ic(n.ic,22,APP.tab===n.id?'var(--accent)':'var(--text3)')}
+          <span class="nav-label" style="color:${APP.tab===n.id?'var(--accent)':'var(--text3)'}">${n.label}</span>
+          ${(n.badge||0)>0?`<span class="nav-badge">${n.badge}</span>`:''}
+          ${APP.tab===n.id?`<div class="nav-indicator"></div>`:''}
+        </button>`).join('')}
+      </div>
+    </div>
+
+    ${renderPaymentModal()}
+    ${renderNewRequestModal(user)}
+
+    ${APP.confirmModal?.mapsUrl?`
+    <div class="modal-overlay open">
+      <div class="modal-box" style="max-width:420px">
+        <div style="font-size:44px;margin-bottom:12px;text-align:center">🚗</div>
+        <h3 style="margin:0 0 8px;font-weight:800;color:var(--green);text-align:center;font-size:18px">Mission acceptée !</h3>
+        <p style="color:var(--text2);margin-bottom:20px;font-size:14px;text-align:center;line-height:1.7">${APP.confirmModal.message}</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <a href="${APP.confirmModal.mapsUrl}" target="_blank" class="btn btn-blue btn-full" style="font-size:14px">
+            ${ic('location',16,'#fff')} Ouvrir l'itinéraire Google Maps
+          </a>
+          ${APP.confirmModal.waUrl?`<a href="${APP.confirmModal.waUrl}" target="_blank" class="btn btn-full" style="background:linear-gradient(135deg,#25D366,#128C7E);font-size:14px">💬 Prévenir le client WhatsApp</a>`:''}
+          <button class="btn btn-primary btn-full" onclick="confirmMissionAccept()">Confirmer & Continuer</button>
+          <button class="btn btn-ghost btn-full" onclick="cancelConfirmModal()">Fermer</button>
+        </div>
+      </div>
+    </div>`:''}
+  </div>`;
+}
+
+function setTab(t){ APP.tab=t; render(); if(t==='map') setTimeout(()=>initLeaflet(),120); }
+
+function bindMainEvents(){
+  bindPaymentModalEvents();
+  bindNewRequestModalEvents();
+  if(APP.tab==='map') setTimeout(()=>initLeaflet(),120);
+  if(APP.tab==='chat'&&APP.activeChat) setTimeout(()=>{ document.getElementById('chatEnd')?.scrollIntoView({behavior:'smooth'}); },120);
+}
+
+// ─── HOME TAB ──────────────────────────────────────────────
+function renderHomeTab(user){
+  const requests=DB.getRequests();
+  const allUsers=DB.getUsers();
+  const localTechs=Object.values(allUsers).filter(u=>u.role==='tech'&&u.id!==user.id&&isPlanActive(u)&&sameLocality(u.location,user.location));
+
+  if(user.role==='driver'){
+    const myRequests=requests.filter(r=>r.userId===user.id);
+    const openReqs=myRequests.filter(r=>r.status==='open');
+    const assignedReqs=myRequests.filter(r=>r.status==='assigned');
+    const resolvedReqs=myRequests.filter(r=>r.status==='resolved');
+
+    return `
+    <!-- Availability banner -->
+    <div class="${localTechs.length>0?'notif-banner':'notif-banner red'}" style="margin-bottom:16px">
+      <div style="font-size:22px">${localTechs.length>0?'🟢':'🔴'}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:14px;color:${localTechs.length>0?'var(--green)':'var(--red)'}">${localTechs.length>0?`${localTechs.length} technicien(s) disponible(s)`:' Aucun technicien dans votre zone'}</div>
+        <div style="color:var(--text2);font-size:12px;margin-top:2px">📍 ${user.location||'Zone non définie'}</div>
+      </div>
+    </div>
+
+    <!-- Hero CTA -->
+    <div class="hero-card" style="text-align:center;margin-bottom:20px">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px;font-weight:600">Vous avez une panne ? Obtenez de l'aide immédiatement</div>
+      <button onclick="openNewRequest()" style="background:linear-gradient(135deg,#FF3D5A,#DC2626);color:#fff;border:none;border-radius:24px;padding:18px 44px;font-weight:900;font-size:18px;cursor:pointer;box-shadow:0 8px 32px rgba(255,61,90,0.4);letter-spacing:-0.3px;transition:transform 0.15s,box-shadow 0.15s;font-family:inherit" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform='scale(1)'">
+        🆘 DEMANDER DE L'AIDE
+      </button>
+      <div style="margin-top:14px;display:flex;justify-content:center;gap:20px">
+        ${[['Urgences',openReqs.length,'#FFB340'],['En cours',assignedReqs.length,'#8B5CF6'],['Résolues',resolvedReqs.length,'#00D37F']].map(([l,c,col])=>`
+        <div style="text-align:center"><div style="font-weight:900;font-size:20px;color:${col}">${c}</div><div style="font-size:11px;color:var(--text2)">${l}</div></div>`).join('')}
+      </div>
+    </div>
+
+    <!-- My requests -->
+    <div class="section-title">${ic('tool',14,'var(--text2)')} Mes demandes (${myRequests.length})</div>
+    ${myRequests.length===0?`
+    <div class="card" style="text-align:center;padding:32px;color:var(--text2)">
+      <div style="font-size:40px;margin-bottom:8px">🔧</div>
+      <p style="font-weight:600">Aucune demande pour le moment</p>
+      <p style="font-size:13px;margin-top:6px">Appuyez sur le bouton 🆘 pour signaler une panne</p>
+    </div>`:
+    myRequests.map(req=>renderRequestCard(req,user,allUsers)).join('')}`;
+  }
+
+  // TECH VIEW
+  const openRequests=requests.filter(r=>{
+    if(r.status!=='open') return false;
+    return sameLocality(r.location,user.location)&&requestMatchesTech(r,user);
+  });
+  const myMissions=requests.filter(r=>r.assignedTo===user.id);
+  const completedMissions=requests.filter(r=>r.assignedTo===user.id&&r.status==='resolved');
+
+  return `
+  <!-- Tech hero -->
+  <div style="background:linear-gradient(135deg,rgba(0,211,127,0.12),rgba(7,14,23,0.9));border:1px solid rgba(0,211,127,0.2);border-radius:20px;padding:20px;margin-bottom:18px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;align-items:center;gap:12px">
+        ${avatarHTML(user,52)}
+        <div>
+          <div style="font-weight:900;font-size:18px;letter-spacing:-0.3px">Bonjour ${user.name.split(' ')[0]} 👷</div>
+          <div style="color:var(--green);font-size:13px;font-weight:600;margin-top:2px">${user.specialty||'Technicien'}</div>
+          <div class="mission-badge" style="margin-top:6px">${ic('zap',12,'var(--green)')} ${myMissions.filter(r=>r.status==='assigned').length} mission(s) active(s)</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:900;font-size:32px;color:var(--green);font-family:'Space Grotesk',sans-serif">${completedMissions.length}</div>
+        <div style="color:var(--text2);font-size:11px;font-weight:600">jobs complétés</div>
+        <div style="margin-top:4px">${stars(user.rating)}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter info -->
+  <div class="card" style="margin-bottom:14px;padding:12px 16px;background:rgba(139,92,246,0.06);border-color:rgba(139,92,246,0.15)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;background:rgba(139,92,246,0.15);border-radius:9px;display:flex;align-items:center;justify-content:center">${ic('locate',15,'#8B5CF6')}</div>
+      <div style="flex:1">
+        <div style="font-size:12px;color:#A78BFA;font-weight:700">ZONE & SPÉCIALITÉ</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:1px">
+          <strong style="color:var(--text)">${user.specialty||'Toutes spécialités'}</strong> · 📍 <strong style="color:var(--text)">${user.location||'Zone non définie'}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  ${myMissions.filter(r=>r.status==='assigned').length>0?`
+  <div class="section-title" style="color:var(--green)">${ic('zap',14,'var(--green)')} Missions en cours</div>
+  ${myMissions.filter(r=>r.status==='assigned').map(req=>renderRequestCard(req,user,DB.getUsers())).join('')}
+  <div style="height:4px"></div>`:''}
+
+  <div class="section-title">${ic('bell',14,'var(--accent)')} Nouvelles demandes (${openRequests.length})</div>
+  ${openRequests.length===0?`
+  <div class="card" style="text-align:center;padding:32px;color:var(--text2)">
+    <div style="font-size:40px;margin-bottom:8px">📍</div>
+    <p style="font-weight:600">Aucune demande compatible</p>
+    <p style="font-size:12px;margin-top:6px;color:var(--text3)">Spécialité : <strong style="color:#8B5CF6">${user.specialty||'Non définie'}</strong> · Zone : <strong style="color:#8B5CF6">${user.location||'Non définie'}</strong></p>
+  </div>`:
+  openRequests.map(req=>renderRequestCard(req,user,DB.getUsers())).join('')}`;
+}
+
+function renderRequestCard(req,user,allUsers){
+  const statusCfg={
+    open:{color:'#FFB340',label:'En attente',bg:'rgba(255,179,64,0.08)'},
+    assigned:{color:'#8B5CF6',label:'Pris en charge',bg:'rgba(139,92,246,0.08)'},
+    resolved:{color:'#00D37F',label:'Résolu',bg:'rgba(0,211,127,0.08)'},
+    done:{color:'#00D37F',label:'Terminé',bg:'rgba(0,211,127,0.08)'},
+    cancelled:{color:'#FF3D5A',label:'Annulé',bg:'rgba(255,61,90,0.08)'},
+  };
+  const sc=statusCfg[req.status]||{color:'#64748B',label:req.status,bg:'transparent'};
+  const assignedUser=req.assignedTo&&allUsers?allUsers[req.assignedTo]:null;
+  const showTechContact=user.role==='driver'&&req.userId===user.id&&req.status==='assigned'&&assignedUser;
+
+  return `
+  <div class="card req-card" style="border-color:${sc.color}20;background:${sc.bg}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:20px">${BREAKDOWN_ICONS[req.breakdownType]||'🔧'}</span>
+        <span style="font-weight:800;font-size:15px">${req.breakdownType}</span>
+      </div>
+      ${badge(sc.label,sc.color)}
+    </div>
+    ${req.description?`<div style="color:var(--text2);font-size:13px;margin-bottom:8px;line-height:1.5">${req.description}</div>`:''}
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+      ${tagSpan('📍 '+req.location,'#8B5CF6')}
+      ${tagSpan('👤 '+req.userName,'#FFB340')}
+      ${req.techType?tagSpan('🔧 '+req.techType,'#00D37F'):''}
+      ${req.urgency==='urgent'?tagSpan('🔴 URGENT','#FF3D5A'):''}
+    </div>
+    <div style="color:var(--text3);font-size:11px;font-weight:600">${timeAgo(req.createdAt)}</div>
+
+    ${showTechContact?renderTechContactCard(assignedUser,req):''}
+
+    ${req.status==='assigned'&&req.assignedName&&!showTechContact?`
+    <div style="margin-top:8px;padding:8px 12px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;font-size:13px;color:#A78BFA;display:flex;align-items:center;gap:10px">
+      ${assignedUser?avatarHTML(assignedUser,26):''}${ic('check',14,'#8B5CF6')} Pris en charge par <strong>${req.assignedName}</strong>
+    </div>`:''}
+
+    ${user.role==='tech'&&req.status==='open'?`
+    <button class="btn btn-green btn-full" style="margin-top:12px" onclick="handleAcceptMission(${JSON.stringify(req).replace(/"/g,'&quot;')})">
+      ${ic('zap',16,'#fff')} Accepter cette mission
+    </button>`:''}
+
+    ${user.role==='tech'&&req.status==='assigned'&&req.assignedTo===user.id?`
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-purple" style="flex:1" onclick="APP.activeChat='chat_${req.userId}_${user.id}';setTab('chat')">
+        ${ic('chat',15,'#fff')} Chat client
+      </button>
+      <button class="btn btn-green" style="flex:1" onclick="handleCompleteRequest('${req.id}')">
+        ${ic('check',15,'#fff')} Terminé
+      </button>
+    </div>`:''}
+  </div>`;
+}
+
+function renderTechContactCard(techUser,req){
+  const expanded=APP.techContactExpanded[req.id];
+  const gmapsLink=req.lat&&req.lng?`https://maps.google.com/?q=${req.lat},${req.lng}`:'';
+  const waLink=techUser.phone?`https://wa.me/${techUser.phone.replace(/\D/g,'')}?text=Bonjour%20${encodeURIComponent(techUser.name)}%2C%20je%20vous%20attends.${req.lat?'%20Ma%20position%20%3A%20https%3A%2F%2Fmaps.google.com%2F%3Fq%3D'+req.lat+'%2C'+req.lng:''}`:null;
+
+  return `
+  <div class="tech-card" id="techCard_${req.id}">
+    <div style="padding:14px 16px;display:flex;align-items:center;gap:12px">
+      <div style="position:relative">
+        ${avatarHTML(techUser,50)}
+        <div class="online-ring"></div>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;flex-wrap:wrap">
+          <span style="font-weight:800;font-size:15px">${techUser.name}</span>
+          <span class="mission-badge" style="font-size:10px;padding:2px 8px">${ic('zap',10,'var(--green)')} En route</span>
+        </div>
+        <div style="color:var(--green);font-size:13px;font-weight:700">🔧 ${techUser.specialty||'Technicien'}</div>
+        ${techUser.garageName?`<div style="color:var(--text2);font-size:11px;margin-top:2px">🏪 ${techUser.garageName}</div>`:''}
+      </div>
+      <button onclick="APP.techContactExpanded['${req.id}']=!APP.techContactExpanded['${req.id}'];render()" class="btn btn-sm btn-ghost">
+        ${expanded?'▲':'▼'}
+      </button>
+    </div>
+    ${expanded?`
+    <div style="padding:0 16px 16px;animation:fadeUp 0.3s ease">
+      <div class="grid2" style="margin-bottom:12px;gap:8px">
+        ${[['Spécialité',techUser.specialty||'—','#8B5CF6'],['Garage',techUser.garageName||'—','#FF6B2B'],['Zone',techUser.garageLocation||techUser.location||'—','#FFB340'],['Stars',stars(techUser.rating||0),'#FFB340']].map(([l,v,c])=>`
+        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border2);border-radius:10px;padding:10px 12px">
+          <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;margin-bottom:4px">${l}</div>
+          <div style="font-size:13px;color:${c};font-weight:700">${v}</div>
+        </div>`).join('')}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${gmapsLink?`<a href="${gmapsLink}" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(59,158,255,0.1);border:1px solid rgba(59,158,255,0.25);border-radius:12px;padding:12px 14px;text-decoration:none;color:var(--text)">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,#3B9EFF,#2563EB);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${ic('location',16,'#fff')}</div>
+          <div><div style="font-size:11px;color:#7DD3FC;font-weight:700;margin-bottom:1px">MA POSITION</div><div style="font-size:13px;font-weight:700">Voir sur Google Maps 🗺️</div></div>
+        </a>`:''}
+        ${waLink?`<a href="${waLink}" target="_blank" style="display:flex;align-items:center;gap:10px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.25);border-radius:12px;padding:12px 14px;text-decoration:none;color:var(--text)">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">💬</div>
+          <div><div style="font-size:11px;color:#86EFAC;font-weight:700;margin-bottom:1px">WHATSAPP</div><div style="font-size:13px;font-weight:700">Contacter ${techUser.name.split(' ')[0]}</div></div>
+        </a>`:''}
+        <button class="btn btn-purple btn-full" onclick="APP.activeChat='chat_${req.userId}_${techUser.id}';setTab('chat')">
+          ${ic('chat',16,'#fff')} Messagerie in-app
+        </button>
+      </div>
+    </div>`:''}
+  </div>`;
+}
+
+function handleAcceptMission(req){
+  const user=APP.user;
+  DB.updateRequest(req.id,{status:'assigned',assignedTo:user.id,assignedName:user.name})
+    .then(async()=>{
+      const chatId=`chat_${req.userId}_${user.id}`;
+      const existing=DB.getMessages().find(m=>m.id===chatId);
+      if(!existing){
+        await DB.insertMessage(chatId,[req.userId,user.id],{[req.userId]:req.userName,[user.id]:user.name},
+          {from:user.id,text:`Bonjour ! Je suis ${user.name} (${user.specialty||'Technicien'}). J'ai pris en charge votre demande et j'arrive. 🔧`});
+      }
+      await loadAllData();
+      if(req.lat&&req.lng){
+        const mapsUrl=`https://maps.google.com/?q=${req.lat},${req.lng}`;
+        const waUrl=req.userPhone?`https://wa.me/${req.userPhone.replace(/\D/g,'')}?text=${encodeURIComponent('Bonjour, je suis '+user.name+' ('+user.specialty+'). J\'ai accepté votre demande et suis en route !')}`:null;
+        APP.confirmModal={message:`Client : <strong>${req.userName}</strong><br/>Panne : <strong>${req.breakdownType}</strong>`,mapsUrl,waUrl};
+        render(); return;
+      }
+      showToast('Mission acceptée ! ✅','success'); render();
+    })
+    .catch(e=>showToast('Erreur : '+(e.message||e),'error'));
+}
+
+function handleCompleteRequest(id){
+  DB.updateRequest(id,{status:'resolved'})
+    .then(()=>loadAllData())
+    .then(()=>{ showToast('Mission marquée comme terminée ✅','success'); render(); })
+    .catch(e=>showToast('Erreur : '+(e.message||e),'error'));
+}
+
+// ─── NEW REQUEST MODAL ──────────────────────────────────────
+function openNewRequest(){
+  const user=APP.user;
+  newReqForm={breakdownType:'',techType:'',location:user.location||'Lomé, Togo',description:'',urgency:'normal',lat:null,lng:null};
+  newReqOpen=true; render();
+  setTimeout(()=>{ document.getElementById('newReqModal')?.classList.add('open'); },50);
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      newReqForm.lat=pos.coords.latitude; newReqForm.lng=pos.coords.longitude;
+      const btn=document.getElementById('gpsLocBtn');
+      if(btn) btn.innerHTML=`${ic('check',13,'var(--green)')} Position GPS capturée : ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+    },()=>{
+      const btn=document.getElementById('gpsLocBtn');
+      if(btn) btn.innerHTML=`⚠️ GPS non disponible — localisation manuelle`;
+    },{enableHighAccuracy:true,timeout:9000});
+  }
+}
+
+function renderNewRequestModal(user){
+  const suggested=newReqForm.breakdownType?(BREAKDOWN_SPECIALTY_MAP[newReqForm.breakdownType]||[]):[];
+  return `
+  <div class="modal-overlay ${newReqOpen?'open':''}" id="newReqModal" style="align-items:flex-end">
+    <div class="modal-sheet" style="width:100%;max-width:600px">
+      <div class="modal-handle"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <h3 style="margin:0;font-weight:800;font-size:18px">🆘 Signaler une panne</h3>
+        <button onclick="closeNewRequest()" style="background:rgba(255,255,255,0.06);border:none;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2)">${ic('close',16)}</button>
+      </div>
+
+      <div class="section-title" style="margin-bottom:8px">Type de panne</div>
+      <select class="inp" style="margin-bottom:10px" onchange="newReqForm.breakdownType=this.value;newReqForm.techType='';reRenderNewReq()">
+        <option value="">-- Choisissez le type de panne --</option>
+        ${BREAKDOWN_TYPES.map(t=>`<option value="${t}" ${newReqForm.breakdownType===t?'selected':''}>${BREAKDOWN_ICONS[t]||''} ${t}</option>`).join('')}
+      </select>
+
+      ${suggested.length>0?`<div style="background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:9px 12px;margin-bottom:10px;font-size:12px;color:#A78BFA;display:flex;align-items:center;gap:8px">${ic('star',12,'#A78BFA')} Recommandé : <strong>${suggested.join(', ')}</strong></div>`:''}
+
+      <div class="section-title" style="margin-bottom:8px">Technicien recherché</div>
+      <select class="inp" style="margin-bottom:10px" onchange="newReqForm.techType=this.value">
+        <option value="">-- Choisissez un type de technicien --</option>
+        ${TECH_TYPES.map(t=>`<option value="${t}" ${newReqForm.techType===t?'selected':''}>${suggested.includes(t)?'✅ '+t+' (recommandé)':t}</option>`).join('')}
+      </select>
+
+      <div class="section-title" style="margin-bottom:8px">Position</div>
+      <input class="inp" style="margin-bottom:8px" placeholder="📍 Votre position (ville / quartier)" value="${newReqForm.location}" oninput="newReqForm.location=this.value"/>
+      <div id="gpsLocBtn" style="background:rgba(59,158,255,0.07);border:1px solid rgba(59,158,255,0.2);border-radius:10px;padding:9px 13px;font-size:12px;color:#7DD3FC;display:flex;align-items:center;gap:8px;margin-bottom:14px;font-weight:600">
+        ${ic('locate',14,'#7DD3FC')} ${newReqForm.lat?ic('check',13,'var(--green)')+' Position GPS capturée':'📡 Détection GPS en cours...'}
+      </div>
+
+      <div class="section-title" style="margin-bottom:8px">Niveau d'urgence</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button class="urgency-btn ${newReqForm.urgency==='normal'?'active-normal':''}" onclick="newReqForm.urgency='normal';reRenderNewReq()">🟡 Normal</button>
+        <button class="urgency-btn ${newReqForm.urgency==='urgent'?'active-urgent':''}" onclick="newReqForm.urgency='urgent';reRenderNewReq()">🔴 Urgent</button>
+      </div>
+
+      <textarea class="inp" style="margin-bottom:16px" placeholder="Description de la panne (optionnel)..." oninput="newReqForm.description=this.value">${newReqForm.description}</textarea>
+
+      <button class="btn btn-red btn-full" style="font-size:16px;padding:16px" onclick="submitNewRequest()" ${!newReqForm.breakdownType||!newReqForm.techType?'disabled':''}>
+        🆘 Envoyer la demande d'aide
+      </button>
+      ${!newReqForm.breakdownType||!newReqForm.techType?`<p style="text-align:center;color:var(--text3);font-size:12px;margin-top:8px">Sélectionnez le type de panne et le technicien</p>`:''}
+    </div>
+  </div>`;
+}
+
+function reRenderNewReq(){
+  const user=APP.user;
+  const overlay=document.getElementById('newReqModal');
+  if(!overlay) return;
+  const suggested=newReqForm.breakdownType?(BREAKDOWN_SPECIALTY_MAP[newReqForm.breakdownType]||[]):[];
+  // Just re-render the sheet inside the overlay without closing it
+  const sheet=overlay.querySelector('.modal-sheet');
+  if(!sheet){ render(); return; }
+  sheet.innerHTML=`
+  <div class="modal-handle"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <h3 style="margin:0;font-weight:800;font-size:18px">🆘 Signaler une panne</h3>
+    <button onclick="closeNewRequest()" style="background:rgba(255,255,255,0.06);border:none;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2)">${ic('close',16)}</button>
+  </div>
+  <div class="section-title" style="margin-bottom:8px">Type de panne</div>
+  <select class="inp" style="margin-bottom:10px" onchange="newReqForm.breakdownType=this.value;newReqForm.techType='';reRenderNewReq()">
+    <option value="">-- Choisissez le type de panne --</option>
+    ${BREAKDOWN_TYPES.map(t=>`<option value="${t}" ${newReqForm.breakdownType===t?'selected':''}>${BREAKDOWN_ICONS[t]||''} ${t}</option>`).join('')}
+  </select>
+  ${suggested.length>0?`<div style="background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:9px 12px;margin-bottom:10px;font-size:12px;color:#A78BFA;display:flex;align-items:center;gap:8px">${ic('star',12,'#A78BFA')} Recommandé : <strong>${suggested.join(', ')}</strong></div>`:''}
+  <div class="section-title" style="margin-bottom:8px">Technicien recherché</div>
+  <select class="inp" style="margin-bottom:10px" onchange="newReqForm.techType=this.value">
+    <option value="">-- Choisissez un type de technicien --</option>
+    ${TECH_TYPES.map(t=>`<option value="${t}" ${newReqForm.techType===t?'selected':''}>${suggested.includes(t)?'✅ '+t+' (recommandé)':t}</option>`).join('')}
+  </select>
+  <div class="section-title" style="margin-bottom:8px">Position</div>
+  <input class="inp" style="margin-bottom:8px" placeholder="📍 Votre position (ville / quartier)" value="${newReqForm.location}" oninput="newReqForm.location=this.value"/>
+  <div id="gpsLocBtn" style="background:rgba(59,158,255,0.07);border:1px solid rgba(59,158,255,0.2);border-radius:10px;padding:9px 13px;font-size:12px;color:#7DD3FC;display:flex;align-items:center;gap:8px;margin-bottom:14px;font-weight:600">
+    ${ic('locate',14,'#7DD3FC')} ${newReqForm.lat?ic('check',13,'var(--green)')+' GPS capturé : '+newReqForm.lat.toFixed(4)+', '+newReqForm.lng.toFixed(4):'📡 Détection GPS en cours...'}
+  </div>
+  <div class="section-title" style="margin-bottom:8px">Niveau d'urgence</div>
+  <div style="display:flex;gap:8px;margin-bottom:14px">
+    <button class="urgency-btn ${newReqForm.urgency==='normal'?'active-normal':''}" onclick="newReqForm.urgency='normal';reRenderNewReq()">🟡 Normal</button>
+    <button class="urgency-btn ${newReqForm.urgency==='urgent'?'active-urgent':''}" onclick="newReqForm.urgency='urgent';reRenderNewReq()">🔴 Urgent</button>
+  </div>
+  <textarea class="inp" style="margin-bottom:16px" placeholder="Description de la panne (optionnel)..." oninput="newReqForm.description=this.value">${newReqForm.description}</textarea>
+  <button class="btn btn-red btn-full" style="font-size:16px;padding:16px" onclick="submitNewRequest()" ${!newReqForm.breakdownType||!newReqForm.techType?'disabled':''}>
+    🆘 Envoyer la demande d'aide
+  </button>
+  ${!newReqForm.breakdownType||!newReqForm.techType?`<p style="text-align:center;color:var(--text3);font-size:12px;margin-top:8px">Sélectionnez le type de panne et le technicien</p>`:''}`;
+}
+
+function closeNewRequest(){ newReqOpen=false; document.getElementById('newReqModal')?.classList.remove('open'); setTimeout(()=>render(),220); }
+function bindNewRequestModalEvents(){
+  const m=document.getElementById('newReqModal');
+  if(m) m.addEventListener('click',e=>{ if(e.target===m) closeNewRequest(); });
+}
+
+function submitNewRequest(){
+  const user=APP.user;
+  if(!newReqForm.breakdownType||!newReqForm.techType) return;
+  const btn=document.querySelector('#newReqModal .btn-red');
+  if(btn){btn.disabled=true;btn.innerHTML='⏳ Envoi en cours...';}
+  DB.insertRequest({...newReqForm,userId:user.id,userName:user.name,userPhone:user.phone||''})
+    .then(async()=>{
+      await loadAllData();
+      const allUsers=DB.getUsers();
+      const matchTechs=Object.values(allUsers).filter(u=>u.role==='tech'&&isPlanActive(u)&&sameLocality(u.location,newReqForm.location)&&requestMatchesTech(newReqForm,u));
+      if(matchTechs.length>0&&matchTechs[0].phone){
+        const t=matchTechs[0];
+        const posText=newReqForm.lat&&newReqForm.lng?`https://maps.google.com/?q=${newReqForm.lat},${newReqForm.lng}`:newReqForm.location;
+        const waMsg=encodeURIComponent(`🆘 Nouvelle demande Panne Solution !\nType: ${newReqForm.breakdownType}\nPosition: ${posText}\nUrgence: ${newReqForm.urgency==='urgent'?'🔴 URGENT':'Normal'}\nClient: ${user.name}\nTél: ${user.phone||'Non renseigné'}`);
+        setTimeout(()=>window.open(`https://wa.me/${t.phone.replace(/\D/g,'')}?text=${waMsg}`,'_blank'),400);
+      }
+      newReqOpen=false;
+      showToast('Demande envoyée ! Les techniciens sont alertés 🆘','success');
+      render();
+    })
+    .catch(e=>{ showToast('Erreur lors de l\'envoi','error'); if(btn){btn.disabled=false;btn.innerHTML='🆘 Envoyer la demande d\'aide';} });
+}
+
+// ─── MAP TAB ───────────────────────────────────────────────
+function renderMapTab(user){
+  const requests=DB.getRequests();
+  const open=requests.filter(r=>r.status==='open');
+  const urgent=open.filter(r=>r.urgency==='urgent');
+  const resolved=requests.filter(r=>r.status==='resolved');
+  return `
+  <div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="font-weight:800;margin:0;font-size:18px">🗺️ Carte des pannes</h3>
+      <div style="display:flex;gap:6px">
+        ${badge(open.length+' actives','#FF6B2B')}
+        ${urgent.length>0?badge(urgent.length+' urgentes','#FF3D5A'):''}
+      </div>
+    </div>
+
+    <div id="mapContainer" style="margin-bottom:14px">
+      <div id="leafletMap"></div>
+      <button onclick="centerMap()" style="position:absolute;bottom:14px;right:14px;z-index:900;background:rgba(7,14,23,0.95);border:1px solid var(--border2);border-radius:12px;padding:10px 14px;cursor:pointer;color:var(--accent);display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+        ${ic('locate',15,'var(--accent)')} Ma position
+      </button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+      ${[['🔴 Urgentes',urgent.length,'var(--red)'],['🟡 En attente',open.length,'var(--yellow)'],['✅ Résolues',resolved.length,'var(--green)']].map(([l,c,col])=>`
+      <div class="stat-card" style="padding:14px"><div class="stat-num" style="color:${col};font-size:22px">${c}</div><div class="stat-label" style="font-size:11px">${l}</div></div>`).join('')}
+    </div>
+
+    <div class="card" style="padding:14px;margin-bottom:14px">
+      <div class="section-title" style="margin-bottom:8px">Légende</div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px">
+        ${[['🔴','Panne urgente'],['🟡','Panne normale'],['🔵','Votre position']].map(([ic,l])=>`<div style="display:flex;align-items:center;gap:7px;font-size:12px"><span>${ic}</span><span style="color:var(--text2)">${l}</span></div>`).join('')}
+      </div>
+    </div>
+
+    ${open.length>0?`
+    <div class="section-title">${ic('alert',14,'var(--yellow)')} Pannes actives</div>
+    ${open.slice(0,6).map(req=>`
+    <div class="card" style="margin-bottom:8px;padding:12px;display:flex;gap:12px;align-items:center">
+      <span style="font-size:22px">${req.urgency==='urgent'?'🔴':'🟡'}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14px">${req.breakdownType}</div>
+        <div style="color:var(--text2);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📍 ${req.location} · ${req.userName}</div>
+      </div>
+      <div style="color:var(--text3);font-size:11px;flex-shrink:0">${timeAgo(req.createdAt)}</div>
+    </div>`).join('')}`:''}
+  </div>`;
+}
+
+function initLeaflet(){
+  const L=window.L;
+  if(!L) return;
+  const mapEl=document.getElementById('leafletMap');
+  if(!mapEl) return;
+  if(leafletInstance){ leafletInstance.invalidateSize(); updateLeafletMarkers(); return; }
+  const DEFAULT=[6.1375,1.2123];
+  const map=L.map(mapEl,{center:DEFAULT,zoom:13,zoomControl:false});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:19}).addTo(map);
+  L.control.zoom({position:'topright'}).addTo(map);
+  leafletInstance=map;
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      userCoords=[pos.coords.latitude,pos.coords.longitude];
+      const ui=L.divIcon({html:`<div style="width:16px;height:16px;background:#3B9EFF;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 8px rgba(59,158,255,0.2)"></div>`,className:'',iconSize:[16,16],iconAnchor:[8,8]});
+      L.marker(userCoords,{icon:ui}).addTo(map).bindPopup('<strong>📍 Vous êtes ici</strong>');
+      map.setView(userCoords,13);
+    },()=>{},{ enableHighAccuracy:true,timeout:9000 });
+  }
+  updateLeafletMarkers();
+}
+
+function updateLeafletMarkers(){
+  if(!leafletInstance) return;
+  const L=window.L;
+  leafletMarkers.forEach(m=>m.remove()); leafletMarkers=[];
+  const requests=DB.getRequests();
+  const DEFAULT=[6.1375,1.2123];
+  requests.filter(r=>r.status==='open').forEach(req=>{
+    let lat,lng;
+    if(req.lat&&req.lng){ lat=req.lat; lng=req.lng; }
+    else{
+      const s1=(req.id.charCodeAt(2)||1)/255, s2=(req.id.charCodeAt(3)||1)/255;
+      lat=DEFAULT[0]+(s1-0.5)*0.06; lng=DEFAULT[1]+(s2-0.5)*0.06;
+    }
+    const color=req.urgency==='urgent'?'#FF3D5A':'#FFB340';
+    const ic2=L.divIcon({html:`<div style="background:${color};width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid rgba(255,255,255,0.9);box-shadow:0 3px 12px rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center"><span style="transform:rotate(45deg);font-size:13px">${req.urgency==='urgent'?'🔴':'🟡'}</span></div>`,className:'',iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[0,-36]});
+    const m=L.marker([lat,lng],{icon:ic2}).addTo(leafletInstance).bindPopup(`<div style="font-family:sans-serif;min-width:180px"><strong style="color:#FF6B2B">${req.breakdownType}</strong><br/><span style="color:#64748B;font-size:12px">📍 ${req.location}</span><br/><span style="color:#64748B;font-size:12px">👤 ${req.userName}</span>${req.urgency==='urgent'?'<br/><span style="color:#FF3D5A;font-weight:700">🔴 URGENT</span>':''}</div>`);
+    leafletMarkers.push(m);
+  });
+}
+function centerMap(){ if(leafletInstance) leafletInstance.setView(userCoords||[6.1375,1.2123],14); }
+
+// ─── CHAT TAB ──────────────────────────────────────────────
+function renderChatTab(user){
+  const messages=DB.getMessages();
+  const allUsers=DB.getUsers();
+  const myChats=messages.filter(m=>m.participants.includes(user.id));
+  const current=myChats.find(m=>m.id===APP.activeChat);
+
+  if(APP.activeChat&&current){
+    const otherId=current.participants.find(p=>p!==user.id);
+    const otherName=current.participantNames?.[otherId]||'Inconnu';
+    const otherUser=allUsers?.[otherId];
+    return `
+    <div style="height:calc(100vh - 140px);display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border2)">
+        <button class="btn btn-ghost btn-sm" onclick="APP.activeChat=null;render()" style="padding:8px">${ic('close',16)}</button>
+        <div style="position:relative">${avatarHTML(otherUser||{name:otherName},40)}<div class="online-ring"></div></div>
+        <div style="flex:1">
+          <div style="font-weight:700">${otherName}</div>
+          ${otherUser?.specialty?`<div style="font-size:11px;color:var(--green);font-weight:600">${otherUser.specialty} · 🟢 En ligne</div>`:''}
+        </div>
+        ${otherUser?.phone?`<a href="tel:${otherUser.phone}" class="btn btn-sm" style="background:rgba(0,211,127,0.1);color:var(--green);border:1px solid rgba(0,211,127,0.2)">${ic('phone',14,'var(--green)')}</a>`:''}
+      </div>
+      <div class="chat-messages" id="chatMsgs" style="flex:1">
+        ${current.messages.map(msg=>`
+        <div style="display:flex;justify-content:${msg.from===user.id?'flex-end':'flex-start'};gap:8px;align-items:flex-end">
+          ${msg.from!==user.id?`<div style="flex-shrink:0">${avatarHTML(otherUser||{name:otherName},26)}</div>`:''}
+          <div class="msg-bubble ${msg.from===user.id?'msg-me':'msg-other'}">
+            <div>${msg.text}</div>
+            <div class="msg-time">${new Date(msg.time).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>
+          </div>
+        </div>`).join('')}
+        <div id="chatEnd"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input class="inp" id="chatInput" placeholder="Votre message..." style="flex:1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}"/>
+        <button class="btn btn-primary" style="padding:12px 16px;flex-shrink:0" onclick="sendChatMessage()">${ic('send',18,'#fff')}</button>
+      </div>
+    </div>`;
+  }
+
+  return `
+  <div>
+    <h3 style="font-weight:800;margin-bottom:14px;font-size:18px">💬 Messagerie</h3>
+    ${myChats.length===0?`
+    <div class="card" style="text-align:center;padding:40px;color:var(--text2)">
+      <div style="font-size:48px;margin-bottom:10px">💬</div>
+      <p style="font-weight:600">Aucune conversation</p>
+      <p style="font-size:13px;margin-top:6px;color:var(--text3)">Les conversations apparaissent quand un technicien accepte une mission</p>
+    </div>`:
+    myChats.map(chat=>{
+      const otherId=chat.participants.find(p=>p!==user.id);
+      const otherName=chat.participantNames?.[otherId]||'Inconnu';
+      const otherUser=allUsers?.[otherId];
+      const msgs=[...chat.messages].sort((a,b)=>a.time-b.time);
+      const last=msgs[msgs.length-1];
+      const unread=msgs.filter(m=>m.from!==user.id&&!m.read).length;
+      return `
+      <div class="card" style="margin-bottom:10px;cursor:pointer;display:flex;gap:12px;align-items:center;transition:border-color 0.2s" onclick="APP.activeChat='${chat.id}';render();setTimeout(()=>document.getElementById('chatEnd')?.scrollIntoView({behavior:'smooth'}),120)" onmouseenter="this.style.borderColor='rgba(255,107,43,0.25)'" onmouseleave="this.style.borderColor='rgba(255,255,255,0.06)'">
+        <div style="position:relative">
+          ${avatarHTML(otherUser||{name:otherName},46)}
+          ${unread>0?`<span style="position:absolute;top:-2px;right:-2px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center">${unread}</span>`:''}
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px">
+            <span style="font-weight:700">${otherName}</span>
+            <span style="color:var(--text3);font-size:11px">${last?new Date(last.time).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):''}</span>
+          </div>
+          ${otherUser?.specialty?`<div style="font-size:11px;color:var(--green);font-weight:600;margin-bottom:2px">${otherUser.specialty}</div>`:''}
+          <div style="color:var(--text2);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${last?.text||'...'}</div>
+        </div>
+        ${unread>0?`<div style="width:8px;height:8px;background:var(--accent);border-radius:50%;flex-shrink:0"></div>`:''}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function sendChatMessage(){
+  const input=document.getElementById('chatInput');
+  if(!input) return;
+  const text=input.value.trim();
+  if(!text||!APP.activeChat) return;
+  const user=APP.user;
+  const messages=DB.getMessages();
+  const current=messages.find(m=>m.id===APP.activeChat);
+  if(!current) return;
+  input.value='';
+  // Optimistic update
+  const newMsg={id:Date.now()+'',from:user.id,text,time:Date.now(),read:false};
+  const optimistic={...current,messages:[...current.messages,newMsg]};
+  DB.setMessages(messages.map(m=>m.id===APP.activeChat?optimistic:m));
+  // Update DOM without full re-render
+  const allUsers=DB.getUsers();
+  const otherId=optimistic.participants.find(p=>p!==user.id);
+  const otherName=optimistic.participantNames?.[otherId]||'Inconnu';
+  const otherUser=allUsers?.[otherId];
+  const msgsEl=document.getElementById('chatMsgs');
+  if(msgsEl){
+    const div=document.createElement('div');
+    div.style.cssText='display:flex;justify-content:flex-end;align-items:flex-end;gap:8px';
+    div.innerHTML=`<div class="msg-bubble msg-me"><div>${text}</div><div class="msg-time">${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div></div>`;
+    const end=document.getElementById('chatEnd');
+    if(end) msgsEl.insertBefore(div,end);
+    document.getElementById('chatEnd')?.scrollIntoView({behavior:'smooth'});
+  }
+  DB.insertMessage(APP.activeChat,current.participants,current.participantNames,{from:user.id,text})
+    .catch(e=>showToast('Erreur d\'envoi','error'));
+}
+
+// ─── PROFILE TAB ───────────────────────────────────────────
+function renderProfileTab(user){
+  const planInfo=PLANS[user.plan]||PLANS.free;
+  const remaining=daysLeft(user.planStart,planInfo.duration);
+  const myRequests=DB.getRequests().filter(r=>r.userId===user.id||r.assignedTo===user.id);
+  const resolved=myRequests.filter(r=>r.status==='resolved').length;
+
+  if(APP.profileEditing){
+    if(!APP.profileForm?.name) APP.profileForm={name:user.name,phone:user.phone||'',location:user.location||'',specialty:user.specialty||'',garageName:user.garageName||'',garageLocation:user.garageLocation||'',photoUrl:user.photoUrl||null};
+    return `
+    <div class="card" style="text-align:center;margin-bottom:14px">
+      ${avatarHTML({...user,...APP.profileForm},72)}
+      <h2 style="margin:10px 0 0;font-size:18px;font-weight:800">${APP.profileForm.name||user.name}</h2>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div style="font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px">${ic('edit',16,'var(--accent)')} Modifier mon profil</div>
+      <input class="inp" style="margin-bottom:10px" placeholder="Nom complet" value="${APP.profileForm.name||''}" oninput="APP.profileForm.name=this.value"/>
+      <input class="inp" style="margin-bottom:10px" placeholder="Téléphone" value="${APP.profileForm.phone||''}" oninput="APP.profileForm.phone=this.value"/>
+      <input class="inp" style="margin-bottom:10px" placeholder="Ville / Quartier" value="${APP.profileForm.location||''}" oninput="APP.profileForm.location=this.value"/>
+      ${user.role==='tech'?`
+      <select class="inp" style="margin-bottom:10px" onchange="APP.profileForm.specialty=this.value">
+        ${TECH_TYPES.map(t=>`<option value="${t}" ${(APP.profileForm.specialty||user.specialty)===t?'selected':''}>${t}</option>`).join('')}
+      </select>
+      <input class="inp" style="margin-bottom:10px" placeholder="🏪 Nom du garage" value="${APP.profileForm.garageName||''}" oninput="APP.profileForm.garageName=this.value"/>
+      <input class="inp" style="margin-bottom:12px" placeholder="📍 Localisation du garage" value="${APP.profileForm.garageLocation||''}" oninput="APP.profileForm.garageLocation=this.value"/>
+      <div style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:13px;padding:14px;margin-bottom:12px">
+        ${renderPhotoUpload('profilePhoto',APP.profileForm.photoUrl||null,'📸 Photo de profil')}
+      </div>`:''}
+      <button class="btn btn-primary btn-full" style="margin-bottom:8px" onclick="saveProfile()">${ic('check',16,'#fff')} Enregistrer</button>
+      <button class="btn btn-ghost btn-full" onclick="APP.profileEditing=false;APP.profileForm={};render()">Annuler</button>
+    </div>`;
+  }
+
+  return `
+  <!-- Profile header -->
+  <div class="card" style="text-align:center;margin-bottom:14px;background:linear-gradient(135deg,rgba(255,107,43,0.08),rgba(11,22,34,0.97))">
+    <div style="position:relative;display:inline-block;margin-bottom:12px">
+      ${avatarHTML(user,80)}
+      <button onclick="APP.profileEditing=true;APP.profileForm={name:'${user.name}',phone:'${user.phone||''}',location:'${user.location||''}',specialty:'${user.specialty||''}',garageName:'${user.garageName||''}',garageLocation:'${user.garageLocation||''}',photoUrl:${user.photoUrl?`'${user.photoUrl}'`:null}};render()" style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--accent);border-radius:50%;border:2.5px solid var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer">${ic('edit',12,'#fff')}</button>
+    </div>
+    <h2 style="margin:0 0 3px;font-size:20px;font-weight:900;letter-spacing:-0.3px">${user.name}</h2>
+    <div style="color:var(--text2);font-size:13px;margin-bottom:12px">${user.email}</div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      ${badge(user.role==='tech'?`🔧 ${user.specialty||'Technicien'}`:'🚗 Conducteur','#8B5CF6')}
+      ${badge(planInfo.icon+' '+planInfo.name,planInfo.color)}
+    </div>
+    ${user.role==='tech'?`
+    <div style="display:flex;justify-content:center;gap:24px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border2)">
+      <div style="text-align:center"><div style="font-weight:900;font-size:22px;color:var(--green);font-family:'Space Grotesk',sans-serif">${resolved}</div><div style="font-size:11px;color:var(--text2)">Jobs réalisés</div></div>
+      <div style="text-align:center"><div style="display:flex;gap:2px;justify-content:center;margin-bottom:2px">${stars(user.rating||0)}</div><div style="font-size:11px;color:var(--text2)">Évaluation</div></div>
+    </div>`:''}
+  </div>
+
+  <!-- Plan card -->
+  <div class="card" style="margin-bottom:14px;border-color:${planInfo.color}22;background:linear-gradient(135deg,${planInfo.color}0A,rgba(11,22,34,0.97))">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div>
+        <div style="font-weight:800;font-size:16px">${planInfo.icon} Plan ${planInfo.name}</div>
+        <div style="color:var(--text2);font-size:13px;margin-top:2px">${user.plan==='free'?`${remaining} jours d'essai restants`:`${remaining} jours avant renouvellement`}</div>
+      </div>
+      ${user.plan==='free'?`<button class="btn btn-purple btn-sm" onclick="openPaymentModal()">🚀 Upgrader</button>`:''}
+    </div>
+    ${user.plan==='free'?`
+    <div class="progress-bar"><div class="progress-fill" style="width:${Math.round((remaining/30)*100)}%;background:linear-gradient(90deg,${remaining>14?'#00D37F':remaining>7?'#FFB340':'#FF3D5A'},${remaining>14?'#3B9EFF':'#FF6B2B'})"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:10px;color:var(--text3)">0 jour</span><span style="font-size:10px;color:var(--text3)">30 jours</span></div>`:''}
+  </div>
+
+  <!-- Info -->
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-weight:700;display:flex;align-items:center;gap:8px">${ic('user',15,'var(--accent)')} Mes informations</div>
+    </div>
+    ${[
+      user.role==='tech'?['🔧',user.specialty||'Non renseigné','Spécialité','rgba(139,92,246,0.1)']:null,
+      user.role==='tech'?['🏪',user.garageName||'Non renseigné','Garage','rgba(255,107,43,0.1)']:null,
+      ['📍',user.location||user.garageLocation||'Non renseigné','Zone','rgba(59,158,255,0.1)'],
+      user.phone?['📞',user.phone,'Téléphone','rgba(0,211,127,0.1)']:null,
+      ['📅',`Membre depuis ${new Date(user.joinedAt||Date.now()).toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}` ,'Inscription','rgba(255,179,64,0.1)'],
+    ].filter(Boolean).map(([emoji,val,label,bg])=>`
+    <div class="info-row">
+      <div class="info-icon" style="background:${bg}"><span style="font-size:16px">${emoji}</span></div>
+      <div style="flex:1"><div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase">${label}</div><div style="font-size:14px;font-weight:600;margin-top:1px">${val}</div></div>
+    </div>`).join('')}
+  </div>
+
+  <button class="btn btn-full" style="background:rgba(255,61,90,0.08);color:var(--red);border:1px solid rgba(255,61,90,0.2);display:flex;align-items:center;justify-content:center;gap:8px" onclick="handleLogout()">
+    ${ic('logout',16,'var(--red)')} Se déconnecter
+  </button>`;
+}
+
+function confirmMissionAccept(){
+  if(APP.confirmModal?.mapsUrl) window.open(APP.confirmModal.mapsUrl,'_blank');
+  if(APP.confirmModal?.waUrl) setTimeout(()=>window.open(APP.confirmModal.waUrl,'_blank'),400);
+  APP.confirmModal=null; showToast('Mission confirmée ✅','success'); render();
+}
+function cancelConfirmModal(){ APP.confirmModal=null; render(); }
+
+function saveProfile(){
+  const user=APP.user;
+  const updates={
+    name:APP.profileForm.name||user.name, phone:APP.profileForm.phone||'',
+    location:APP.profileForm.garageLocation||APP.profileForm.location||user.location||'',
+    specialty:APP.profileForm.specialty||user.specialty||'',
+    garageName:APP.profileForm.garageName||user.garageName||'',
+    garageLocation:APP.profileForm.garageLocation||user.garageLocation||'',
+    photoUrl:APP.profileForm.photoUrl!==undefined?APP.profileForm.photoUrl:user.photoUrl,
+  };
+  DB.updateProfile(user.id,updates)
+    .then(async()=>{
+      await loadAllData();
+      APP.user={...user,...updates}; DB.setCurrentUser(APP.user);
+      APP.profileEditing=false; APP.profileForm={};
+      showToast('Profil mis à jour ✅','success'); render();
+    })
+    .catch(e=>showToast('Erreur : '+(e.message||e),'error'));
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GLOBAL
+// ═══════════════════════════════════════════════════════════
+function handleLogout(){
+  DB.signOut()
+    .then(()=>{ leafletInstance=null; leafletMarkers=[]; render(); })
+    .catch(()=>{ DB.setCurrentUser(null); leafletInstance=null; leafletMarkers=[]; render(); });
+}
+
+// Expose to global
+Object.assign(window,{
+  render, setAuthMode, handleAuthSubmit, handleLogin, handleRegister,
+  renderAuthRoleFields, handlePhotoUpload, clearPhoto,
+  openPaymentModal, closePaymentModal, reRenderPayModal, handlePaySubmit,
+  openNewRequest, submitNewRequest, reRenderNewReq, closeNewRequest,
+  setTab, handleAcceptMission, handleCompleteRequest,
+  handleCancelRequest(id){ DB.updateRequest(id,{status:'cancelled'}).then(()=>loadAllData().then(render)); },
+  confirmMissionAccept, cancelConfirmModal,
+  sendChatMessage, centerMap,
+  saveProfile, handleLogout,
+  adminApprovePayment, adminRejectPayment, adminDeleteUser,
+  loadAllData,
+  APP, payState, newReqForm, authForm,
+});
+
+// DB subscribe for plan activation notifications
+DB.subscribe(()=>{
+  const u=DB.getCurrentUser();
+  if(u&&APP.user&&u.id===APP.user.id&&u.planStatus==='active'&&APP.user.planStatus==='pending'){
+    showToast(`🎉 Plan ${PLANS[u.plan]?.name||''} activé !`,'success');
+  }
+});
+
+
+// ═══════════════════════════════════════════════════════════
+//  ÉCRAN SQL SETUP (si tables manquantes)
+// ═══════════════════════════════════════════════════════════
+var SQL_SCRIPT = `-- 1. TABLE PROFILES
+create table if not exists profiles (
+  id uuid primary key references auth.users on delete cascade,
+  email text, name text, role text default 'driver',
+  phone text, specialty text, garage_name text, garage_location text,
+  location text, photo_url text,
+  plan text default 'free', plan_start bigint, plan_status text default 'active',
+  pending_plan text, pending_payment_id text, joined_at bigint,
+  rating float default 0, completed_jobs int default 0,
+  created_at timestamptz default now()
+);
+alter table profiles enable row level security;
+create policy if not exists "Public read" on profiles for select using (true);
+create policy if not exists "Own insert" on profiles for insert with check (auth.uid() = id);
+create policy if not exists "Own update" on profiles for update using (auth.uid() = id);
+
+-- 2. TABLE REQUESTS
+create table if not exists requests (
+  id uuid primary key default gen_random_uuid(),
+  breakdown_type text, tech_type text, location text,
+  description text, urgency text default 'normal',
+  user_id uuid, user_name text, user_phone text,
+  status text default 'open', assigned_to uuid, assigned_name text,
+  lat float, lng float, created_at timestamptz default now()
+);
+alter table requests enable row level security;
+create policy if not exists "All read" on requests for select using (true);
+create policy if not exists "Auth insert" on requests for insert with check (auth.role() = 'authenticated');
+create policy if not exists "Auth update" on requests for update using (auth.role() = 'authenticated');
+
+-- 3. TABLE MESSAGES
+create table if not exists messages (
+  id uuid primary key default gen_random_uuid(),
+  chat_id text, participants uuid[], participant_names jsonb,
+  sender_id uuid, text text, read boolean default false,
+  created_at timestamptz default now()
+);
+alter table messages enable row level security;
+create policy if not exists "Auth all" on messages for all using (auth.role() = 'authenticated');
+
+-- 4. TABLE PAYMENTS
+create table if not exists payments (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid, user_name text, user_email text,
+  plan text, plan_name text, method text, method_name text,
+  tx_ref text, amount int, status text default 'pending',
+  reviewed_at timestamptz, reviewed_by text, reject_reason text,
+  created_at timestamptz default now()
+);
+alter table payments enable row level security;
+create policy if not exists "Auth all" on payments for all using (auth.role() = 'authenticated');
+
+-- 5. Activer Realtime
+alter publication supabase_realtime add table profiles;
+alter publication supabase_realtime add table requests;
+alter publication supabase_realtime add table messages;
+alter publication supabase_realtime add table payments;`;
+
+function renderSQLSetupScreen(){
+  return `
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg)">
+    <div style="width:100%;max-width:560px">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:52px;margin-bottom:12px">🗄️</div>
+        <h1 style="font-size:22px;font-weight:900;color:var(--text);margin:0 0 8px">Tables manquantes</h1>
+        <p style="color:var(--text2);font-size:14px;line-height:1.7">Votre projet Supabase est connecté mais les tables n'ont pas encore été créées.<br/>Exécutez le script SQL ci-dessous dans votre dashboard.</p>
+      </div>
+      <div class="card card-glow" style="margin-bottom:16px">
+        <div style="background:rgba(0,211,127,0.07);border:1px solid rgba(0,211,127,0.2);border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:#6EE7B7;line-height:1.8">
+          <strong>Étapes :</strong><br/>
+          1. Ouvrez <a href="https://supabase.com/dashboard" target="_blank" style="color:var(--green);text-decoration:underline">supabase.com/dashboard</a><br/>
+          2. Sélectionnez votre projet<br/>
+          3. Allez dans <strong>SQL Editor</strong> → <strong>New Query</strong><br/>
+          4. Collez le script ci-dessous et cliquez <strong>Run</strong>
+        </div>
+        <div style="position:relative">
+          <pre id="sqlBlock" style="background:rgba(0,0,0,0.4);border:1px solid rgba(0,211,127,0.15);border-radius:12px;padding:14px;font-size:11px;color:#6EE7B7;overflow-x:auto;white-space:pre-wrap;line-height:1.7;max-height:280px;overflow-y:auto">${SQL_SCRIPT.replace(/</g,'&lt;')}</pre>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <button class="btn btn-green" style="flex:1" onclick="navigator.clipboard.writeText(SQL_SCRIPT).then(()=>showToast('SQL copié ! ✅','success'))">
+            📋 Copier le SQL
+          </button>
+          <button class="btn btn-primary" style="flex:1" onclick="location.reload()">
+            🔄 Réessayer
+          </button>
+        </div>
+      </div>
+      <div class="card" style="padding:14px;background:rgba(255,179,64,0.06);border-color:rgba(255,179,64,0.2)">
+        <div style="font-size:12px;color:#FCD34D;font-weight:700;margin-bottom:6px">⚠️ Note importante</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">Si les tables existent déjà, vérifiez que les <strong style="color:var(--text)">politiques RLS</strong> sont bien activées et que votre clé Supabase est la clé <strong style="color:var(--text)">anon/publique</strong> (pas la clé service_role).</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+
+// ═══════════════════════════════════════════════════════════
+//  ÉCRAN DE CONFIGURATION DES CLÉS SUPABASE
+// ═══════════════════════════════════════════════════════════
+function renderKeySetupScreen(errorMsg){
+  return `
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg)">
+    <div style="width:100%;max-width:460px">
+      <div style="text-align:center;margin-bottom:28px">
+        <div class="logo-mark" style="width:64px;height:64px;border-radius:20px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center">${ic('wrench',30,'#fff')}</div>
+        <h1 style="font-size:24px;font-weight:900;margin:0 0 6px">Panne Solution</h1>
+        <p style="color:var(--text2);font-size:14px">Configuration de la base de données</p>
+      </div>
+      <div class="card card-glow">
+        ${errorMsg ? `<div style="background:rgba(255,61,90,0.08);border:1px solid rgba(255,61,90,0.25);border-radius:12px;padding:12px 14px;margin-bottom:18px;font-size:13px;color:var(--red);display:flex;align-items:flex-start;gap:10px">${ic('alert',16,'var(--red)')}<div><strong>Erreur de connexion</strong><br/>${errorMsg}</div></div>` : ''}
+        <div style="background:rgba(0,211,127,0.07);border:1px solid rgba(0,211,127,0.2);border-radius:12px;padding:14px;margin-bottom:20px;font-size:13px;color:#6EE7B7;line-height:1.8">
+          <strong>Comment obtenir votre clé anon :</strong><br/>
+          1. <a href="https://supabase.com/dashboard" target="_blank" style="color:var(--green);text-decoration:underline">supabase.com/dashboard</a> → votre projet<br/>
+          2. <strong>Settings</strong> → <strong>API</strong><br/>
+          3. Copiez <strong>Project URL</strong> et la clé <strong>anon / public</strong> (commence par <code style="background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:4px">eyJ...</code>)
+        </div>
+        <label style="display:block;font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">URL du projet</label>
+        <input class="inp" id="ks_url" placeholder="https://xxxx.supabase.co" style="margin-bottom:14px" value="${SUPA_URL||''}"/>
+        <label style="display:block;font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">Clé anon (commence par eyJ...)</label>
+        <input class="inp" id="ks_key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." style="margin-bottom:20px" value="${SUPA_KEY&&SUPA_KEY.startsWith('eyJ')?SUPA_KEY:''}"/>
+        <button class="btn btn-primary btn-full" id="ks_btn" onclick="handleKeySetupSubmit()">
+          ${ic('zap',16,'#fff')} Connecter
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function handleKeySetupSubmit(){
+  const url = (document.getElementById('ks_url')||{value:''}).value.trim();
+  const key = (document.getElementById('ks_key')||{value:''}).value.trim();
+  const btn = document.getElementById('ks_btn');
+  if(!url || !key){ showToast('Remplissez les deux champs','error'); return; }
+  if(!url.includes('supabase.co')){ showToast("L'URL doit contenir supabase.co",'error'); return; }
+  if(!key.startsWith('eyJ')){ showToast("La clé doit commencer par eyJ... (clé anon JWT)",'error'); return; }
+  if(btn){ btn.disabled=true; btn.innerHTML='⏳ Test de connexion...'; }
+  // Tester la connexion
+  try{
+    await loadSupabaseSDK();
+    SUPA_URL = url; SUPA_KEY = key;
+    supabase = window.supabase.createClient(url, key, { auth:{ persistSession:true, autoRefreshToken:true } });
+    // Test réel : lire profiles
+    const { error } = await supabase.from('profiles').select('id').limit(1);
+    if(error && (error.message||'').includes('Failed to fetch')){
+      throw new Error('Connexion échouée — vérifiez l’URL et la clé');
+    }
+    // Sauvegarder
+    localStorage.setItem('ps_supa_url', url);
+    localStorage.setItem('ps_supa_key', key);
+    showToast('Connexion réussie ! ✅','success');
+    // Boot suite
+    await bootAfterInit();
+  } catch(e){
+    const msg = e?.message || String(e);
+    if(btn){ btn.disabled=false; btn.innerHTML=ic('zap',16,'#fff')+' Connecter'; }
+    document.getElementById('app').innerHTML = renderKeySetupScreen(msg);
+    bindKeySetupEvents();
+  }
+}
+
+function bindKeySetupEvents(){
+  const k = document.getElementById('ks_key');
+  if(k) k.addEventListener('keydown', e=>{ if(e.key==='Enter') handleKeySetupSubmit(); });
+}
+
+async function bootAfterInit(){
+  try{
+    // 1. Session + profiles en priorité → affiche l'UI rapidement
+    const { data:{ session } } = await supabase.auth.getSession();
+    if(session){
+      try{
+        const p = await DB.fetchProfile(session.user.id);
+        DB.setCurrentUser(p);
+      }catch(e){ console.warn('fetchProfile:', e?.message); }
+    }
+    await loadEssentialData();
+
+    // 2. Afficher l'UI immédiatement
+    render();
+
+    // 3. Charger le reste en arrière-plan
+    loadBackgroundData().then(()=>{
+      DB.subscribeRealtime();
+      render(); // Re-render avec toutes les données
+    });
+
+  } catch(e){
+    console.warn('bootAfterInit error:', e?.message||String(e));
+    render();
+  }
+
+  supabase.auth.onAuthStateChange(async(event, session)=>{
+    if(event==='SIGNED_IN' && session){
+      try{
+        const p=await DB.fetchProfile(session.user.id);
+        DB.setCurrentUser(p);
+        await loadEssentialData();
+        render();
+        loadBackgroundData().then(()=>render());
+      }catch(e){}
+    } else if(event==='SIGNED_OUT'){
+      DB.setCurrentUser(null); render();
+    }
+  });
+}
+
+Object.assign(window, { handleKeySetupSubmit, bindKeySetupEvents });
+
+// ═══════════════════════════════════════════════════════════
+//  BOOT — charge le SDK puis vérifie la clé anon
+// ═══════════════════════════════════════════════════════════
+(async()=>{
+  // Splash
+  document.getElementById('app').innerHTML=`
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:var(--bg)">
+    <div class="logo-mark" style="width:60px;height:60px;border-radius:18px;animation:glow 2s ease-in-out infinite">${ic('wrench',28,'#fff')}</div>
+    <div class="spinner"></div>
+    <div style="color:var(--text2);font-size:13px;font-weight:600">${APP_NAME}</div>
+  </div>`;
+
+  // 1. Charger le SDK Supabase
+  try{ await loadSupabaseSDK(); }
+  catch(e){
+    document.getElementById('app').innerHTML=`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg)"><div class="card" style="max-width:380px;text-align:center"><div style="font-size:48px;margin-bottom:12px">❌</div><h2 style="color:var(--red);margin:0 0 10px">Pas de connexion</h2><p style="color:var(--text2);margin-bottom:16px">Impossible de charger le SDK. Vérifiez votre connexion internet.</p><button class="btn btn-primary btn-full" onclick="location.reload()">🔄 Réessayer</button></div></div>`;
+    return;
+  }
+
+  // 2. Vérifier que la clé est une clé JWT anon valide (commence par eyJ)
+  if(!SUPA_KEY || !SUPA_KEY.startsWith('eyJ')){
+    document.getElementById('app').innerHTML = renderKeySetupScreen(
+      SUPA_KEY ? 'La clé fournie n’est pas une clé anon JWT. Elle doit commencer par eyJ... (pas sb_publishable_...)' : null
+    );
+    bindKeySetupEvents();
+    return;
+  }
+
+  // 3. Initialiser le client
+  if(!initSupabase()){
+    document.getElementById('app').innerHTML = renderKeySetupScreen('Erreur d’initialisation du client Supabase.');
+    bindKeySetupEvents();
+    return;
+  }
+
+  // 4. Boot normal — on laisse Supabase gérer les erreurs réseau
+  await bootAfterInit();
+})();
+</script>
+</body>
+</html>
